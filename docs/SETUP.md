@@ -36,6 +36,8 @@ Verify:
 
 ```powershell
 ccx_i8.exe -v
+# optional: solve the bundled 1 mm-cube smoke deck (expect max |U| ≈ 5.17e-6 mm, < 0.1 s)
+Push-Location scripts; ccx_i8.exe -i smoke; Pop-Location
 ```
 
 ### Why `ccx_i8` and not `ccx`
@@ -71,7 +73,11 @@ Pop-Location
 ```
 
 Expected: `result.json` with `max_disp_mm ≈ 0.0708` and `max_vm_stress_MPa ≈ 51.6` for the
-500 N case (element-peak value, un-averaged).
+500 N case.  `max_vm_stress_MPa` is the **nodal extrapolated peak** from the FRD (values
+averaged over the elements sharing each node); the element-averaged peak is ≈40.4 MPa.
+The peak sits on the clamped fillet edge and keeps rising with mesh refinement, so it is a
+"mesh-band reproducible" number, not a converged stress.  Add `python scripts/render.py --job
+<dir>` if you also want the PNGs (it reuses the same `frd_reader` summary).
 
 ## 5. Unit convention (structural)
 

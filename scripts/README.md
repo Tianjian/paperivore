@@ -10,11 +10,11 @@ Run them with the repository venv: `.venv\Scripts\python scripts\<script>.py ...
 | `model.py` | parametric box cantilever → STEP | `python scripts/model.py --job results/box-cantilever-500N` |
 | `mesh.py` | STEP → gmsh → `.msh` + physical groups | `python scripts/mesh.py --job results/box-cantilever-500N` |
 | `deck.py` | `.msh` + loads → CalculiX `.inp` | `python scripts/deck.py --job results/box-cantilever-500N` |
-| `frd_reader.py` | `.frd` → `.vtu` + `result.json` | `python scripts/frd_reader.py --job results/box-cantilever-500N` |
+| `frd_reader.py` | `.frd` → `.vtu` + `frd.json` + `result.json` (writes FRD **nodal** stresses to `point_data` and element averages to `cell_data`) | `python scripts/frd_reader.py --job results/box-cantilever-500N` |
 | `render.py` | stress/displacement PNG from the `.vtu` | `python scripts/render.py --job results/box-cantilever-500N` |
 | `run_job.ps1` | the whole chain in one call | `pwsh scripts/run_job.ps1 -Job results/box-cantilever-500N -SkipSolve` |
 | `params.example.json` | input schema for `run_job.ps1` | — |
-| `smoke.inp` | minimal CalculiX deck used to verify the solver install | `ccx_i8.exe -i smoke` |
+| `smoke.inp` | minimal CalculiX deck used to verify the solver install (1 mm cube, 1 N; max \|U\| ≈ 5.17e-6 mm) | `ccx_i8.exe -i smoke` |
 
 ## Airfoils
 
@@ -29,7 +29,7 @@ Run them with the repository venv: `.venv\Scripts\python scripts\<script>.py ...
 
 | Script | Purpose | Usage |
 |---|---|---|
-| `blade_geometry.py` | Glauert chord/twist → NACA 5512 loft → STEP/STL | `--job results/wind-blade-25m --R 26.5 --tsr 9 --cl 1.2` |
+| `blade_geometry.py` | Glauert chord/twist → NACA 5512 loft → STEP/STL | `--job results/wind-blade-25m --R 26.5 --tsr 9 --cl 1.2 --nsec 20 --rhub 2.5` |
 | `blade_bem.py` | BEM: `Cp–TSR`, power curve, thrust | `--job results/wind-blade-25m` |
 | `blade_fea.py` | `mesh` / `post`: centrifugal + aerodynamic load | `--job results/wind-blade-25m --h 0.9` |
 | `blade_viz.py` | blade 2D distributions, `Cp–TSR`, 3D rotor | `--job results/wind-blade-25m` |
@@ -46,7 +46,7 @@ Uses **SI units** (m, N, Pa, kg, s, K) — the only scripts that do.
 
 | Script | Purpose | Usage |
 |---|---|---|
-| `afpm_model.py` | AFPM 3D geometry; 2D magnetostatic solver (scalar potential, periodic BC) | `geom` / `field --job results/afpm-pcb-motor` |
+| `afpm_model.py` | AFPM 3D geometry; 2D magnetostatic solver (scalar potential, periodic BC) + dual-rotor 1-D circuit | `geom` / `field --job results/afpm-pcb-motor` (`field` writes `Bg_fem_T`, `Bg_circuit_T`, `flux_per_pole_{fem,circuit}_Wb`) |
 | `afpm_viz.py` | assembly render, r-z section, `Kt(N, h_m)` study | `--job results/afpm-pcb-motor` |
 
 ## Drawing / projection (optional)

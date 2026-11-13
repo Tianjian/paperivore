@@ -150,14 +150,14 @@ params.json → build123d → part.step → gmsh → ccx_i8 → PyVista → stre
 | **G1 包安装** | `pip install -i <镜像> build123d gmsh pyvista` | `import build123d, gmsh, pyvista` 成功 |
 | **G2 建模** | `model.py` 输出 STEP | `is_valid`、体积 > 0、bbox 与参数一致 |
 | **G3 网格** | `mesh.py` 输出 `.inp` + `groups.json` | `part.inp` **只含 C3D4/C3D10**（grep 不到 `CPS6`）；固定/加载节点 > 0 |
-| **G4 求解器冒烟** | 复制 `scripts/smoke.inp` 到临时目录并 `ccx_i8.exe -i smoke` | 退出码 0；`.sta` 有 1 个增量；**0.04 s 内完成** |
+| **G4 求解器冒烟** | 在 `scripts/` 里跑 `ccx_i8.exe -i smoke`（1 mm 立方体、1 N，max\|U\| ≈ 5.17e-6 mm） | 退出码 0；`.sta` 有 1 个增量；**< 0.1 s 完成** |
 | **G5 全链路 + 已知答案** | `run_job.ps1` + 线性自检（载荷 ×1.6） | 位移/应力比值 1.6±1%；`.dat` 无 `*ERROR` |
 | **G6（可选）制图** | `run_job.ps1 -WithFreeCAD` | `freecad/report.json` 体积一致；`drawing.pdf` 图框/标题栏/尺寸齐全 |
 
 配套的 3 条工程习惯：
 
-1. **最小可复现优先**：任何"工具疑似坏了"，先跑 `smoke.inp`（45 节点 / 100 单元，0.04 s），能跑再怪模型。
-   注意 `smoke.inp` 本身是**用 gmsh 生成**的——手写 C3D4 顺序会 `nonpositive jacobian`，这再次证明"别手拼单元连接表"。
+1. **最小可复现优先**：任何"工具疑似坏了"，先跑 `scripts/smoke.inp`（8 节点 / 1 个 C3D8 单元，< 0.1 s），能跑再怪模型。
+   注意：一阶六面体 C3D8 的节点顺序可以手写；但**二阶四面体 C3D10 的连接表必须由 gmsh 写**（手拼会 `nonpositive jacobian`），见 `mesh.py` 文件头。
 2. **产物断言 > 退出码**：CalculiX 返回 0 不代表成功，FreeCADCmd 异常也返回 0；一律查 `.dat`/`.sta`/产物。
 3. **固定版本 + 记录版本**：`ccx_i8 2.23`、`gmsh 4.15.2`、`build123d 0.13.0`、`numpy 2.5.4`、`pyvista 0.49.2`、`FreeCAD 1.1.4`。
 

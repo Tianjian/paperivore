@@ -1,6 +1,6 @@
 # Windows 上基于 DeepSeek Harness 的开源 CAD / CAE 机械设计工具链研究报告
 
-> 版本：v1.1 ｜ 调研日期：2026-11-01 ｜ 环境：Windows 11 x64，DeepSeek Harness (dsh) desktop profile
+> 版本：v1.2 ｜ 调研日期：2026-11-01 ｜ 修订：2026-11-13（后处理节点/单元语义修正）｜ 环境：Windows 11 x64，DeepSeek Harness (dsh) desktop profile
 > 本版本包含**本机实测**的端到端流水线（build123d → gmsh → CalculiX ccx_i8 → PyVista），不是纸面调研。
 > 目标：在 Windows 本机搭建**全开源**、**Agent 友好**（可被 LLM 以文件 + CLI 方式可靠驱动）的机械 CAD / CAE 工具链
 > 结论先行：**可以完整搭建，而且不需要任何商业软件。** 唯一必须接受的取舍是"用代码建模（CAD-as-Code）而不是点鼠标建模"。
@@ -30,9 +30,9 @@
 | Python | 3.13.9（Microsoft Store 版；首轮曾误判其缺 `venv`，复测证明 venv/ensurepip 正常，见 §7.1） |
 | `pip install build123d` | ✅ 成功，build123d **0.13.0**（本项目 venv） |
 | `build123d` 建模 + 导出 | ✅ `Box(80,40,12)` + 2 mm 圆角：`is_valid=True`、体积 38358.796 mm³、STEP 31,743 B |
-| `gmsh` 4.15.2 网格 | ✅ 35,497 节点 / 22,324 个 C3D10 单元，固定面 173 节点、加载面 3,085 节点 |
+| `gmsh` 4.15.2 网格 | ✅ 35,510 节点 / 22,333 个 C3D10 单元，固定面 173 节点、加载面 3,085 节点 |
 | `CalculiX ccx_i8` 2.23 求解 | ✅ 13.2 s 完成，`*ERROR` 0 条，`job.sta` 显示 1 步 1 增量收敛 |
-| 结果 | ✅ 最大位移 **0.070832 mm**，最大 von Mises **51.60 MPa**（500 N 作用于 80×40×12 梁中跨，固定端圆角处；节点平均后 36.83 MPa） |
+| 结果 | ✅ 最大位移 **0.070832 mm**，最大 von Mises **51.60 MPa**（节点外插峰值；500 N 作用于 80×40×12 梁的自由端面（max-X 面），固定端为 min-X 面；同一复现网格的单元平均峰值 40.38 MPa） |
 | 线性自检 | ✅ 同一套网格把载荷改到 800 N：位移 0.113330 mm、应力 82.56 MPa，**位移与逐节点应力张量比值均为 1.6000** |
 | 出图 | ✅ `stress.png`（等轴测）+ `stress_side.png`（侧视，可见固定端应力集中） |
 | `winget` 可用包 | FreeCAD **1.1.4**、OpenSCAD **2021.01**/Nightly、ParaView **6.2.0**（含 MPI 版）、Gmsh **4.13.1**、Blender 5.2.3、MSYS2 **20260927** |
@@ -42,6 +42,12 @@
 
 > 可复现实物：`results/box-cantilever-500N/`（`params.json` → `part.step` → `part.inp` → `job.inp` → `job.frd` → `job.vtu` → `stress.png` / `result.json`），脚本在 `skills/cad-cae/scripts/`。
 > 运行环境：便携版 MSYS2 解压在 `msys/msys64`（`pacman` 装的 ccx），无需管理员权限、不改系统 PATH。
+
+> **Post-fix 说明（2026-11-13 复现后修订）**：`frd_reader.py` 的节点/单元语义已修正——CalculiX 的 FRD `STRESS` 块是**节点结果**（每个节点一条，由单元积分点外插并在共享节点间平均），旧实现把它按**单元 id** 索引造成静默错位。现行版本：`point_data["S"]/["S_vm"]` = FRD 原生节点值（峰值即**节点外插峰值**），`cell_data["S"]/["S_vm"]` = 单元连接上的节点平均（派生量，供云图）；`result.json` 的 `max_vm_stress_note` 已更新为 "nodal extrapolated peak from raw FRD (values averaged over elements at nodes)"，后处理另提供 `max_vm_stress_element_avg_MPa`（单元平均峰值）。因此同一组结果现在有两个口径：
+> - **51.60 MPa = 节点外插峰值**（`max_vm_stress_MPa`，artifact 保留的口径）；
+> - **40.38 MPa = 同一复现网格的单元平均峰值**（`max_vm_stress_element_avg_MPa`）。
+>
+> 该峰值随网格加密单调上升、**不收敛**（h=6/4/3 mm → 44.5/49.6/51.0 MPa），只能在"网格带内可复现"，不能作为收敛判据。旧文中的"节点平均后 36.83 MPa"无法用节点平均复现（那是旧管线渲染表面平滑的产物，无物理意义），已删除。
 
 
 ---
@@ -307,9 +313,9 @@ ElmerSolver.exe case.sif                 # SIF 纯文本，输出 .vtu/.ep
 
 `ccx2paraview` 3.2.0 在 **numpy ≥ 2** 下会抛 `TypeError: '<' not supported between instances of 'complex' and 'complex'`（`calculate_principal()` 直接排序复数特征值）。本报告因此带了一个 60 行的 `skills/cad-cae/scripts/frd_reader.py`：
 
-- 从 `job.frd` 的 `100CL` 结果块里读 `DISP` / `STRESS`（12 字符定宽解析，处理"数值之间无空格"的 `5-5.05751E-04`）；
+- 从 `job.frd` 的 `100CL` 结果块里读 `DISP` / `STRESS`（12 字符定宽解析，处理"数值之间无空格"的 `5-5.05751E-04`）；**FRD 的 `STRESS` 是节点结果（每个节点一条，由单元积分点外插并在共享节点间平均）**；
 - 用 `part.inp` 的 `C3D4/C3D10` 拓扑建 `pyvista.UnstructuredGrid`；
-- 单元结果 `cell_data_to_point_data()` 平滑到节点，出图才不是"一个个色块"。
+- `point_data["S"]/["S_vm"]` 放 FRD 原生节点值（真实场），`cell_data["S"]/["S_vm"]` 放单元连接上的节点平均（派生量、供云图）；`python frd_reader.py --job <dir>` 已是有用的 CLI，会写 `job.vtu` + `frd.json` + `result.json`。
 
 ```python
 # render.py 的核心（已在 Windows 实测出图）
@@ -527,7 +533,7 @@ SU2_CFD.exe config.cfg
 - [ ] 跑通 `run_job.ps1`（或 §5.1 的 5 条命令），产出 `stress.png` + `result.json`
 - [ ] 验收：`result.json` 无 `*ERROR`，`max_disp_mm`/`max_vm_stress_MPa` 为有限值且量级合理（可与解析解对照）
 
-> 本机参考结果（80×40×12、2 mm 圆角、钢、500 N 中跨下压）：`max_disp_mm = 0.070832`、`max_vm_stress_MPa = 51.60`（单元峰值；节点平均 36.83）、求解 13.2 s。
+> 本机参考结果（80×40×12、2 mm 圆角、钢、500 N 自由端面下压，固定端为 min-X 面）：`max_disp_mm = 0.070832`、`max_vm_stress_MPa = 51.60`（节点外插峰值；同一复现网格单元平均峰值 40.38 MPa）、求解 13.2 s。注意该峰值随网格加密上升（h=6/4/3 mm → 44.5/49.6/51.0 MPa）、不收敛，只作网格带内复现性参考。
 
 ### 阶段 2：固化为 Skill + 参数化（1–2 天）
 
@@ -555,13 +561,13 @@ results/box-cantilever-500N/
 ├── params.json        80×40×12 mm，2 mm 圆角，钢 E=210 GPa ν=0.3，500 N 向 -Z
 ├── model.json         volume 38358.796 mm³，bbox [80,40,12]，STEP 31,743 B
 ├── part.step          build123d 0.13.0 / OCCT 8.0.1
-├── mesh.json          nodes 35,497；C3D10 × 22,324；fixed 173 节点；load 3,085 节点
+├── mesh.json          nodes 35,510；C3D10 × 22,333；fixed 173 节点；load 3,085 节点
 ├── groups.json        FIXED/LOAD 精确节点号（按坐标平面筛选）
 ├── job.inp            4.0 MB：*NODE/*ELEMENT(C3D10)/*NSET/*MATERIAL/*STATIC/*BOUNDARY/*CLOAD
 ├── job.frd            CalculiX 2.23 结果（ccx_i8.exe，13.2 s）
 ├── job.sta            1 step / 1 increment / 收敛
-├── job.vtu            35,510 点，数组 U / U_mag / S / S_vm
-├── result.json        max_disp_mm 0.070832，max_vm_stress_MPa 51.60（单元峰值），errors []
+├── job.vtu            35,510 点，数组 U / U_mag / S / S_vm（节点值；S 另有单元平均的 cell_data 版本）
+├── result.json        max_disp_mm 0.070832，max_vm_stress_MPa 51.60（节点外插峰值；单元平均 40.38），errors []
 ├── stress.png         等轴测应力云图
 └── stress_side.png    XZ 侧视，固定端应力集中可见
 ```
@@ -586,10 +592,12 @@ Set-Location results\box-cantilever-500N; ccx_i8.exe -i job
 4. `result.json` 的 `max_disp_mm`、`max_vm_stress_MPa` 为有限值，量级与手算/经验相符；
 5. `stress.png` 存在，且用 `read_image` 目视确认不是纯色。
 
-| 工况 | 载荷 | 最大位移 | 最大 von Mises（单元峰值） | 求解时间 |
+| 工况 | 载荷 | 最大位移 | 最大 von Mises（节点外插峰值） | 求解时间 |
 |---|---|---|---|---|
 | job-0001 | 500 N | 0.070832 mm | 51.60 MPa | 13.2 s |
 | job-0003 | 800 N（同一套网格） | 0.113330 mm | 82.56 MPa | 14.4 s |
+
+> 表中 von Mises 为 FRD 节点外插峰值，不是单元积分点峰值；同一复现网格的单元平均峰值为 40.38 MPa（500 N）。
 
 位移比值 1.59997、应力比值 1.60000；逐节点检查 `S` 张量的每个分量，比值都是 1.59999±1e-5，
 证明这是严格线弹性响应而非数值巧合。**建议把这条"载荷×1.6 ⇒ 结果×1.6"作为流水线的常驻回归断言** —— 它比"退出码为 0"可靠得多。

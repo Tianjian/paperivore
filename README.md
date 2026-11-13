@@ -70,16 +70,20 @@ kept in this repository as the receipts.
 | # | Prey (open-access paper) | What was tested | Verdict | Headline error |
 |---|---|---|---|---|
 | 1 | Box cantilever (self-check) | STEP → mesh → CalculiX → PyVista pipeline | ✅ pass | 0.0708 mm @ 500 N, 0.1133 mm @ 800 N |
-| 2 | NACA 4412 wing (Zenodo) | airfoil geometry + box-spar FEA vs beam theory | ✅ pass | geometry < 0.1 %; tip deflection **+6.7 %** (systematic, mesh-independent) |
-| 3 | NACA 2412 / 4412 polars (J. Thermal Eng. 2024) | 10 lift points, lift-curve slope, stall trend | ✅ pass | pre-stall **4.5 – 23 %**; slope error **0.3 %** (2412); stall divergence expected |
-| 4 | 25 m HAWT blade (RERA 2026) | Glauert design, BEM `Cp–TSR`, power curve, solid FEA | ✅ pass / ⚠️ | `Cp` **−11 %**, 9 m/s power **−8.9 %**; 14 m/s power **−21.5 %** (polar model) |
-| 5 | Exhaust pipe (Thermal Science 2010) | steady conduction + two-sided convection (`*FILM`) | ✅ pass | **0.001 %** vs exact 1D; **0.168 %** vs fin solution |
-| 6 | PCB axial-flux motor (arXiv 2509.23561) | magnetic circuit + custom 2D magnetostatics | ❌ fail (honest) | `Kt` **−53 %**, `R` **−40 %** — paper lacks magnet thickness / turn definition |
+| 2 | NACA 4412 wing (Zenodo) | airfoil geometry + box-spar FEA vs beam theory | ✅ pass | geometry < 0.1 %; tip deflection **+6.7 %** (systematic, mesh-converged: +8.4 % at 4 mm); section stress **≤3.1 %** |
+| 3 | NACA 2412 / 4412 polars (J. Thermal Eng. 2024) | 10 lift points, lift-curve slope, stall trend | ✅ pass | pre-stall **4.5 – 23 %**; slope **+0.3 %** as a 0–10° fit (5–10° alone: −24 %); stall divergence expected |
+| 4 | 25 m HAWT blade (RERA 2026) | Glauert design, BEM `Cp–TSR`, power curve, solid FEA | ✅ pass / ⚠️ | `Cp` **−11 %** (design-law φ ≈3–6 pp + quadrature); 9 m/s power **−8.9 %**; 14 m/s power **−21.5 %** (post-stall polar; −0.5 % with Viterna) |
+| 5 | Exhaust pipe (Thermal Science 2010) | steady conduction + two-sided convection (`*FILM`) | ✅ pass | **0.001 %** vs exact 1D (conformance test); **0.168 %** vs fin solution (≈96 % post-processing convention) |
+| 6 | PCB axial-flux motor (arXiv 2509.23561) | corrected dual-rotor circuit + custom 2D magnetostatics | ❌ fail (honest) | `Kt` **−53 %** (FEA) / **−62 %** (circuit), `R` **−40 %** — paper lacks magnet thickness / turn definition |
 
-**Rejected prey** (screened out, kept in `papers/` for transparency): papers whose tables
-were internally inconsistent, e.g. an airfoil paper reporting `Cl = 0.0589` at 0° while its
-own 5° value implied ≈ 0.23, or force tables that could not be reconciled with their own
-coefficients by a consistent reference area.
+**Rejected prey** (screened out, kept in `papers/` for transparency): `exhaust_manifold.pdf`
+does contain a steady-state thermal study, but the temperature field is shown only as
+contours and the geometry/boundary conditions are insufficient to rebuild it, so there is
+no pointwise number to check. Internal-table inconsistencies are handled differently when
+the paper is otherwise usable: the J. Thermal Eng. polars (Round 3 above) report
+`Cl = 0.0589` at 0° — thin-airfoil theory implies 0.228 and the force/coefficient tables
+cannot be reconciled by any single reference area — so that case is scored only on the
+pre-stall, internally consistent points and the anomaly is recorded in its report.
 
 ---
 
@@ -99,11 +103,11 @@ coefficients by a consistent reference area.
 
 | Capability | Validator | Measured accuracy |
 |---|---|---|
-| Linear structural FEA | CalculiX `ccx_i8` vs beam theory | tip deflection **+6.7 %** (repeatable, explained by shear lag in a wide thin flange) |
+| Linear structural FEA | CalculiX `ccx_i8` vs beam theory | tip deflection **+6.7 %** (repeatable; load idealisation + web shear, not flange shear lag) |
 | Heat conduction + convection | CalculiX `*HEAT TRANSFER` vs closed-form | **0.001 %** (uniform), **0.168 %** (axial gradient, fin reference) |
-| Lifting-line / thin airfoil | own implementation vs paper polars | slope **0.3 %**, `Cl` pre-stall **4.5 – 23 %** |
+| Lifting-line / thin airfoil | own implementation vs paper polars | slope **0.3 %** (0–10° fit), `Cl` pre-stall **4.5 – 23 %** |
 | Blade-element momentum | own BEM vs paper `Cp–TSR` | `Cp,max` **−11 %**, power at 9 m/s **−8.9 %** |
-| 2D magnetostatics | own scalar-potential FEM vs magnetic circuit | **24 %** disagreement — and the reason is understood (see limits) |
+| 2D magnetostatics | own scalar-potential FEM vs corrected dual-rotor circuit | **≈22 %** disagreement (the old single-rotor formula gave 111 %); periodic BC fixed |
 
 ---
 
@@ -120,6 +124,8 @@ python -m venv .venv
 # Solver side: CalculiX from MSYS2 (no VIP required)
 #   pacman -S mingw-w64-ucrt-x86_64-ccx
 # then put msys64\ucrt64\bin on PATH
+# verify the install with the bundled minimal deck:
+#   Push-Location scripts; ccx_i8.exe -i smoke; Pop-Location
 
 # Run one case end to end
 .venv\Scripts\python scripts\model.py  --job results\box-cantilever-500N
@@ -127,6 +133,8 @@ python -m venv .venv
 .venv\Scripts\python scripts\deck.py   --job results\box-cantilever-500N
 Push-Location results\box-cantilever-500N; ccx_i8.exe -i job; Pop-Location
 .venv\Scripts\python scripts\frd_reader.py --job results\box-cantilever-500N
+# (optional) images + result.json via the renderer:
+.venv\Scripts\python scripts\render.py --job results\box-cantilever-500N
 ```
 
 Every case in the ledger has its exact command block inside its report in `docs/`.
@@ -138,7 +146,7 @@ Python — no CalculiX, no gmsh, no CAD kernel:
 
 ```powershell
 pip install numpy scipy pytest
-pytest -q          # 25 tests, < 2 s
+pytest -q          # 28 tests, < 2 s
 ```
 
 These tests pin the golden values the reports quote. If a refactor moves a baseline, CI
@@ -227,6 +235,26 @@ papers/README.md           one new row: source · licence · what was extracted
 Cases that *fail honestly* are as welcome as cases that pass — arguably more.
 
 ---
+
+## Recent corrections (v1.1, 2026-11-13)
+
+A reproducibility audit found and fixed several defects; the reports and artefacts were
+regenerated accordingly:
+
+- `frd_reader.py`: the FRD `STRESS` block is **nodal** (one record per node). The old code
+  indexed it by element id and wrote it to `cell_data` — the nodal peak was mislabelled as
+  an "element peak" and the wing section-stress table was invalid. Nodal data now goes to
+  `point_data`, element averages to `cell_data`, and the CLI is real (`--job` writes
+  `job.vtu`, `frd.json`, `result.json`).
+- `airfoil_validate.py`: the S2 ordinate check interpolated a reversed TE→LE polyline
+  (`upper_calc` was always 0); it now evaluates the NACA equations analytically.
+- `afpm_model.py`: the 1-D circuit used the single-rotor topology (0.1793 T); the machine
+  is a dual-rotor TORUS (0.3093 T). The 2-D periodic boundary condition silently clamped
+  one side to φ = 0; it is now a true slave-DOF merge.
+- `thermal_pipe.py`: `build123d` is imported only when the STEP actually has to be
+  generated; `blade_fea.py` counts elements correctly; `blade_geometry.py` wires `--rhub`
+  and its docstrings now state the implemented φ/chord convention; `smoke.inp` exists.
+- Regression tests: 25 → 28 (airfoil S2, AFPM circuit/turns, BEM parameters).
 
 ## Licence
 

@@ -31,12 +31,12 @@ conventions, and the sanity-check command that must reproduce `0.0708 mm` at 500
 
 ## The one-line summary of every report
 
-- **Toolchain**: 2.5 GB of environment, 11 chapters of pitfalls, all open source.
+- **Toolchain**: ≈1.5 GB of environment (≈2.5 GB with optional FreeCAD), 11 chapters of pitfalls, all open source.
 - **FreeCAD**: keep it as a human review station, never in the automated loop.
-- **Airfoil #1**: geometry is trivial; the 6.7 % deflection offset is the real lesson.
+- **Airfoil #1**: geometry is trivial; the 6.7 % deflection offset is load idealisation + web shear (not flange shear lag), and the section stresses agree with beam theory to ≤3.1 %.
 - **Airfoil #2**: inviscid theory over-predicts lift — by design, not by bug.
-- **Wind blade**: BEM gets `Cp` within 11 %; the low-TSR polar is where it loses.
-- **Thermal**: 0.001 % against an exact solution — and a 1.7 % "error" that was the
-  reference model's fault, not the solver's.
+- **Wind blade**: BEM gets `Cp` within 11 %; the φ convention of the design law costs ~3–6 pp, the low-TSR post-stall polar the rest.
+- **Thermal**: 0.001 % against an exact solution (a conformance test of `*FILM`) — and a 1.7 % "error" that was the
+  reference model's fault; most of the remaining 0.168 % is post-processing convention.
 - **Motor**: the toolchain can now compute magnetic fields, and immediately found that
-  the paper's own parameter set cannot reproduce its measured torque constant.
+  the paper's own parameter set cannot reproduce its measured torque constant (`Kt` −53 % on the 2-D field, −62 % on the corrected dual-rotor circuit).
