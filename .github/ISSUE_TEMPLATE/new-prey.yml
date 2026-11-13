@@ -1,0 +1,63 @@
+name: New prey (benchmark paper)
+description: Propose a paper to add to the validation bench
+title: "[prey] <paper short title>"
+labels: ["new-prey"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Before opening this, check that the paper has *numbers* (not only contour plots),
+        complete geometry/BCs, and an open licence. See CONTRIBUTING.md.
+  - type: input
+    id: citation
+    attributes:
+      label: Citation
+      placeholder: "Authors, Title, Venue vol(issue): pages, year"
+    validations:
+      required: true
+  - type: input
+    id: identifier
+    attributes:
+      label: DOI / arXiv / URL
+      placeholder: "10.xxxx/xxxxx or arXiv:xxxx.xxxxx"
+    validations:
+      required: true
+  - type: input
+    id: licence
+    attributes:
+      label: Licence
+      placeholder: "CC BY 4.0 / CC BY-NC / publisher open access / unknown"
+    validations:
+      required: true
+  - type: textarea
+    id: numbers
+    attributes:
+      label: What can be compared
+      description: Which tables or figures carry values a solver can be checked against?
+      placeholder: |
+        Table 3: Cl at alpha = 0, 5, 10 deg
+        Figure 7: wall temperature along the axis (digitizable)
+    validations:
+      required: true
+  - type: textarea
+    id: parameters
+    attributes:
+      label: Parameters present / missing
+      description: List geometry, materials, boundary conditions; call out what is missing.
+      placeholder: |
+        present: chord, span, mesh, inlet velocity
+        missing: turbulence model details, wall roughness
+    validations:
+      required: true
+  - type: textarea
+    id: physics
+    attributes:
+      label: Which capability would this exercise?
+      placeholder: "steady conduction, thin-airfoil theory, BEM, magnetic circuit, ..."
+  - type: checkboxes
+    id: honest
+    attributes:
+      label: Agreement
+      options:
+        - label: I understand a failing case is still a valid contribution.
+          required: true

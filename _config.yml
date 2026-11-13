@@ -1,0 +1,11 @@
+title: Paperivore
+description: An open-source CAD/CAE toolchain that devours papers and grows.
+theme: jekyll-theme-cayman
+show_downloads: false
+
+# keep the site build small and predictable
+exclude:
+  - papers/*.pdf
+  - results/**/*.step
+  - .venv
+  - "*.inp"

@@ -1,0 +1,40 @@
+name: Bug in the toolchain
+description: A script, solver deck or post-processing step is wrong
+title: "[bug] <what breaks>"
+labels: ["bug"]
+body:
+  - type: input
+    id: case
+    attributes:
+      label: Affected case
+      placeholder: "results/wind-blade-25m or a new minimal example"
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected vs actual
+      description: Include the numbers. "The reference says 0.4626, I get 0.31" beats "wrong".
+    validations:
+      required: true
+  - type: textarea
+    id: repro
+    attributes:
+      label: Reproduction command
+      render: powershell
+      placeholder: |
+        python scripts/blade_bem.py --job results/wind-blade-25m
+    validations:
+      required: true
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment
+      placeholder: "Windows 11, Python 3.13, CalculiX 2.23 (ccx_i8), gmsh 4.15"
+  - type: checkboxes
+    id: rules
+    attributes:
+      label: House rules
+      options:
+        - label: I have not tuned any constant to make the comparison close.
+          required: true
