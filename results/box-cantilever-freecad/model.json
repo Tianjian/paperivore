@@ -1,0 +1,12 @@
+{
+  "step": "runs\\job-0005\\part.step",
+  "stl": "runs\\job-0005\\part.stl",
+  "volume_mm3": 38358.796447,
+  "bbox_mm": [
+    80.0,
+    40.0,
+    12.0
+  ],
+  "elapsed_s": 15.991,
+  "units": "mm-N-MPa"
+}

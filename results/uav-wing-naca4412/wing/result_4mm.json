@@ -1,0 +1,96 @@
+{
+  "fea": {
+    "tip_deflection_mm": 1.8657,
+    "max_s11_MPa": 4.0265,
+    "max_s33_MPa": 12.9495,
+    "max_vm_stress_MPa": 11.1667,
+    "tip_nodes": 988,
+    "n_disp": 120025,
+    "n_stress": 120025
+  },
+  "beam_theory": {
+    "tip_deflection_mm": 1.7217,
+    "root_moment_Nm": 213.27,
+    "root_bending_stress_MPa": 6.6954,
+    "deflection_span_ratio": 0.001435
+  },
+  "deflection_profile": [
+    {
+      "z_mm": 100.0,
+      "fea_deflection_mm": 0.0418,
+      "beam_deflection_mm": 0.0226,
+      "rel_err": 0.8465,
+      "n_nodes": 583
+    },
+    {
+      "z_mm": 200.0,
+      "fea_deflection_mm": 0.1257,
+      "beam_deflection_mm": 0.0855,
+      "rel_err": 0.4707,
+      "n_nodes": 583
+    },
+    {
+      "z_mm": 400.0,
+      "fea_deflection_mm": 0.3739,
+      "beam_deflection_mm": 0.3047,
+      "rel_err": 0.2274,
+      "n_nodes": 587
+    },
+    {
+      "z_mm": 600.0,
+      "fea_deflection_mm": 0.7032,
+      "beam_deflection_mm": 0.6098,
+      "rel_err": 0.1533,
+      "n_nodes": 586
+    },
+    {
+      "z_mm": 800.0,
+      "fea_deflection_mm": 1.0783,
+      "beam_deflection_mm": 0.9636,
+      "rel_err": 0.119,
+      "n_nodes": 584
+    },
+    {
+      "z_mm": 1000.0,
+      "fea_deflection_mm": 1.4722,
+      "beam_deflection_mm": 1.3395,
+      "rel_err": 0.099,
+      "n_nodes": 585
+    },
+    {
+      "z_mm": 1200.0,
+      "fea_deflection_mm": 1.864,
+      "beam_deflection_mm": 1.7217,
+      "rel_err": 0.0827,
+      "n_nodes": 1035
+    }
+  ],
+  "sections": [
+    {
+      "z_mm": 100.0,
+      "fea_max_s33_MPa": 6.25,
+      "beam_sigma_MPa": 5.626,
+      "rel_err": 0.111,
+      "n_elements": 201
+    },
+    {
+      "z_mm": 200.0,
+      "fea_max_s33_MPa": 7.724,
+      "beam_sigma_MPa": 4.65,
+      "rel_err": 0.6613,
+      "n_elements": 351
+    },
+    {
+      "z_mm": 400.0,
+      "fea_max_s33_MPa": 9.761,
+      "beam_sigma_MPa": 2.976,
+      "rel_err": 2.2801,
+      "n_elements": 756
+    }
+  ],
+  "error": {
+    "deflection_rel_err": 0.0836,
+    "root_peak_s33_rel_err": 0.9341
+  },
+  "note": "deflection profile is the primary check; the S33 peak is mesh/boundary sensitive in the 3 mm walls"
+}

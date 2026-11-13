@@ -1,0 +1,12 @@
+{
+  "step": "runs\\job-0005\\part.step",
+  "volume_mm3": 38358.796,
+  "faces": 10,
+  "edges": 24,
+  "freecad_version": "1.1.4",
+  "fcstd": "runs\\job-0005\\freecad\\model.FCStd",
+  "fcstd_bytes": 2772,
+  "dxf": "runs\\job-0005\\freecad\\drawing.dxf",
+  "dxf_bytes": 16743,
+  "note": "TechDraw headless export writes geometry only; title-block text needs ezdxf"
+}

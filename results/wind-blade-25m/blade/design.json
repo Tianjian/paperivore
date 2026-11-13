@@ -1,0 +1,154 @@
+{
+  "paper": {
+    "title": "Aerodynamic Performance Assessment and Blade Design Optimization of HAWTs",
+    "doi": "10.22044/rera.2026.17534.1520",
+    "reported": {
+      "Cp_max": 0.52,
+      "Cp_TSR": 9,
+      "power_9m_s_kW": 500,
+      "power_14m_s_kW": 1373,
+      "rpm": 25,
+      "B": 3
+    }
+  },
+  "design": {
+    "R_m": 26.5,
+    "tsr": 9.0,
+    "B": 3,
+    "cl_design": 1.2,
+    "alpha_design_deg": 7.0,
+    "airfoil": "NACA 5512",
+    "chord_max_m": 2.5,
+    "chord_scale_applied": 1.0,
+    "n_sections": 20
+  },
+  "bbox_m": [
+    2.461,
+    1.697,
+    24.0
+  ],
+  "step": "runs\\wind-blade-01\\blade\\blade.step",
+  "stl": "runs\\wind-blade-01\\blade\\blade.stl",
+  "rows": [
+    {
+      "r_m": 2.5,
+      "r_over_R": 0.0943,
+      "chord_m": 2.5,
+      "twist_deg": 42.667
+    },
+    {
+      "r_m": 3.763,
+      "r_over_R": 0.142,
+      "chord_m": 2.5,
+      "twist_deg": 31.041
+    },
+    {
+      "r_m": 5.026,
+      "r_over_R": 0.1897,
+      "chord_m": 2.5,
+      "twist_deg": 23.362
+    },
+    {
+      "r_m": 6.289,
+      "r_over_R": 0.2373,
+      "chord_m": 2.5,
+      "twist_deg": 18.087
+    },
+    {
+      "r_m": 7.553,
+      "r_over_R": 0.285,
+      "chord_m": 2.4889,
+      "twist_deg": 14.299
+    },
+    {
+      "r_m": 8.816,
+      "r_over_R": 0.3327,
+      "chord_m": 2.1707,
+      "twist_deg": 11.469
+    },
+    {
+      "r_m": 10.079,
+      "r_over_R": 0.3803,
+      "chord_m": 1.9214,
+      "twist_deg": 9.285
+    },
+    {
+      "r_m": 11.342,
+      "r_over_R": 0.428,
+      "chord_m": 1.7217,
+      "twist_deg": 7.553
+    },
+    {
+      "r_m": 12.605,
+      "r_over_R": 0.4757,
+      "chord_m": 1.5586,
+      "twist_deg": 6.148
+    },
+    {
+      "r_m": 13.868,
+      "r_over_R": 0.5233,
+      "chord_m": 1.4231,
+      "twist_deg": 4.987
+    },
+    {
+      "r_m": 15.132,
+      "r_over_R": 0.571,
+      "chord_m": 1.3088,
+      "twist_deg": 4.012
+    },
+    {
+      "r_m": 16.395,
+      "r_over_R": 0.6187,
+      "chord_m": 1.2112,
+      "twist_deg": 3.182
+    },
+    {
+      "r_m": 17.658,
+      "r_over_R": 0.6663,
+      "chord_m": 1.127,
+      "twist_deg": 2.467
+    },
+    {
+      "r_m": 18.921,
+      "r_over_R": 0.714,
+      "chord_m": 1.0536,
+      "twist_deg": 1.845
+    },
+    {
+      "r_m": 20.184,
+      "r_over_R": 0.7617,
+      "chord_m": 0.9891,
+      "twist_deg": 1.3
+    },
+    {
+      "r_m": 21.447,
+      "r_over_R": 0.8093,
+      "chord_m": 0.932,
+      "twist_deg": 0.817
+    },
+    {
+      "r_m": 22.711,
+      "r_over_R": 0.857,
+      "chord_m": 0.881,
+      "twist_deg": 0.387
+    },
+    {
+      "r_m": 23.974,
+      "r_over_R": 0.9047,
+      "chord_m": 0.8353,
+      "twist_deg": 0.002
+    },
+    {
+      "r_m": 25.237,
+      "r_over_R": 0.9523,
+      "chord_m": 0.7941,
+      "twist_deg": -0.345
+    },
+    {
+      "r_m": 26.5,
+      "r_over_R": 1.0,
+      "chord_m": 0.7567,
+      "twist_deg": -0.66
+    }
+  ]
+}

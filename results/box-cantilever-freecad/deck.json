@@ -1,0 +1,12 @@
+{
+  "deck": "runs\\job-0005\\job.inp",
+  "solid_elset": "Volume1",
+  "fixed_nodes": 77,
+  "load_nodes": 925,
+  "force_per_node_N": [
+    0.0,
+    0.0,
+    -0.540541
+  ],
+  "analysis": "STATIC"
+}

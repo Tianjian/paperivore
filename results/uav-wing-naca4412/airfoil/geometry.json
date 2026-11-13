@@ -1,0 +1,15 @@
+{
+  "chord_mm": 300.0,
+  "n_profile_points": 479,
+  "bbox_mm": [
+    300.138,
+    38.357,
+    0.0
+  ],
+  "area_mm2": 7424.554,
+  "area_ratio": 0.0825,
+  "max_thickness_mm": 38.357,
+  "thickness_ratio_bbox": 0.12786,
+  "step": "runs\\uav-wing-01\\airfoil\\naca4412_chord300.step",
+  "step_bytes": 1857259
+}

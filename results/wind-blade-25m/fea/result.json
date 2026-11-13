@@ -1,0 +1,8 @@
+{
+  "tip_deflection_m": 0.0637,
+  "tip_deflection_mm": 63.72,
+  "max_vm_stress_MPa": 20.05,
+  "tip_nodes": 1035,
+  "stress_3d": "runs\\wind-blade-01\\viz\\stress_3d.png",
+  "deformed_3d": "runs\\wind-blade-01\\viz\\deformed_3d.png"
+}

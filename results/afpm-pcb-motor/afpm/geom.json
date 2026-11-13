@@ -1,0 +1,9 @@
+{
+  "poles": 10,
+  "r_o": 0.0095,
+  "r_i": 0.0035,
+  "pcb_t": 0.006,
+  "gap": 0.00025,
+  "h_m_assumed": 0.001,
+  "step": "runs\\afpm-01\\afpm\\afpm.step"
+}

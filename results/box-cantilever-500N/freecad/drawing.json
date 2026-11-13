@@ -1,0 +1,26 @@
+{
+  "annotated_dxf": "runs\\job-0001\\freecad\\drawing_annotated.dxf",
+  "pdf": "runs\\job-0001\\freecad\\drawing.pdf",
+  "preview": "runs\\job-0001\\freecad\\drawing_preview.png",
+  "cjk_font": true,
+  "views": {
+    "Front": [
+      108.5,
+      99.0,
+      188.5,
+      111.0
+    ],
+    "Top": [
+      108.5,
+      85.0,
+      188.5,
+      125.0
+    ],
+    "FRAME": [
+      137.0,
+      10.0,
+      287.0,
+      46.0
+    ]
+  }
+}

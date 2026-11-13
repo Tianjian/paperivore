@@ -1,0 +1,24 @@
+cff-version: 1.2.0
+title: "Paperivore: a CAD/CAE toolchain grown by validating against papers"
+abstract: >-
+  An open-source Windows CAD/CAE toolchain (build123d, gmsh, CalculiX, PyVista)
+  that is built incrementally by reproducing published papers: each paper becomes
+  a benchmark, every mismatch is traced to the solver, the reference model, or the
+  paper itself, and the fix is kept as a regression case.
+message: "If you use this benchmark set, please cite it as below."
+type: software
+authors:
+  - family-names: Chen
+    given-names: Tianjian
+version: 1.0.0
+date-released: 2026-11-13
+license: MIT
+repository-code: "https://github.com/Tianjian/paperivore"
+keywords:
+  - CAD
+  - CAE
+  - finite element
+  - validation
+  - open science
+  - CalculiX
+  - build123d

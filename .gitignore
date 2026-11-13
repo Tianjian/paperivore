@@ -1,0 +1,32 @@
+# python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# solver scratch (never commit meshes / decks / result databases)
+*.frd
+*.inp
+*.msh
+*.dat
+*.sta
+*.cvg
+*.12d
+*.vtu
+*.pvtu
+*.FCStd
+
+# keep the curated artefacts
+!results/**/*.json
+!results/**/*.png
+!results/**/*.csv
+!results/**/*.step
+
+# os
+Thumbs.db
+.DS_Store
+desktop.ini
+
+# editors
+.vscode/
+.idea/

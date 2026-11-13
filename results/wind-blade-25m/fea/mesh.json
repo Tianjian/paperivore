@@ -1,0 +1,15 @@
+{
+  "nodes": 5193,
+  "elements": 1,
+  "element_type": "C3D4",
+  "mesh_size_m": 0.9,
+  "root_nodes": 1018,
+  "thrust_per_blade_N": 28050.0,
+  "cload_sum_N": 28050.0,
+  "omega_rad_s": 2.618,
+  "rpm": 25.0,
+  "z_range_mm": [
+    2500.0,
+    26500.0
+  ]
+}

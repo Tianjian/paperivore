@@ -1,0 +1,12 @@
+# normalise line endings: LF in the repo, native on checkout
+* text=auto eol=lf
+
+# binary
+*.pdf  binary
+*.png  binary
+*.step binary
+*.stp  binary
+*.FCStd binary
+
+# markdown diffs stay readable
+*.md text eol=lf

@@ -1,0 +1,21 @@
+{
+  "vtk": "runs\\job-0003\\job.vtu",
+  "n_points": 35510,
+  "arrays": [
+    "U",
+    "U_mag",
+    "S",
+    "S_vm"
+  ],
+  "max_disp_mm": 0.11332989713546629,
+  "max_vm_stress_MPa": 82.55908658936654,
+  "max_vm_stress_note": "element peak from raw FRD (un-averaged)",
+  "image": "runs\\job-0003\\stress.png",
+  "image_side": "runs\\job-0003\\stress_side.png",
+  "sta_tail": [
+    "SUMMARY OF JOB INFORMATION",
+    "  STEP      INC     ATT  ITRS     TOT TIME     STEP TIME      INC TIME",
+    "     1          1     1     1  0.100000E+01  0.100000E+01  0.100000E+01"
+  ],
+  "errors": []
+}

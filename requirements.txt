@@ -1,0 +1,9 @@
+# core geometry + meshing + FEA post-processing
+build123d>=0.13,<0.14
+gmsh>=4.15,<5
+pyvista>=0.49,<0.50
+numpy>=2.0,<3
+scipy>=1.14,<2
+matplotlib>=3.8,<4
+# drawing / DXF annotation (optional case)
+ezdxf>=1.3,<2

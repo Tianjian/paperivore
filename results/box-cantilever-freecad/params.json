@@ -1,0 +1,31 @@
+﻿{
+  "geometry": {
+    "length": 80.0,
+    "width": 40.0,
+    "height": 12.0,
+    "fillet": 2.0
+  },
+  "material": {
+    "name": "steel",
+    "E": 210000.0,
+    "nu": 0.3,
+    "rho": 7.85e-9
+  },
+  "mesh": {
+    "size_min": 1.5,
+    "size_max": 6.0,
+    "order": 2
+  },
+  "bc": {
+    "fixed_face_tag": 10,
+    "load_face_tag": 20,
+    "load_total_N": 500.0,
+    "load_direction": [0, 0, -1]
+  },
+  "solver": {
+    "analysis": "static",
+    "threads": 8
+  },
+  "units": "mm-N-MPa"
+}
+

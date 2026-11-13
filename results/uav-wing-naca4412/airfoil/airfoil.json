@@ -1,0 +1,128 @@
+{
+  "paper": {
+    "title": "Computational Analysis of Flow Characteristics over NACA 4412 Airfoil Using CFD simulation at Varying Angles of Attack",
+    "authors": "A. Sarkar, V. K. Mahto",
+    "venue": "IJRIT 12(2):3882-3886, 2025",
+    "doi": "10.5281/zenodo.16422521",
+    "license": "CC-BY-4.0",
+    "reported": {
+      "Cl": 1.791092,
+      "Cd": 0.3620392,
+      "AOA": null,
+      "Re": "30-60 m/s inlet, air at 1.225 kg/m3"
+    }
+  },
+  "design_parameters": {
+    "airfoil": "NACA 4412",
+    "m": 0.04,
+    "p": 0.4,
+    "t": 0.12,
+    "max_camber_ratio": 0.04,
+    "max_camber_x": 0.4,
+    "max_thickness_ratio": 0.12
+  },
+  "S1_geometry": {
+    "measured": {
+      "max_thickness_ratio": 0.119888,
+      "max_thickness_x": 0.307721,
+      "max_camber_ratio": 0.04,
+      "max_camber_x": 0.398866,
+      "le_radius_ratio": 0.015867,
+      "te_gap": 0.002497894
+    },
+    "reference": {
+      "max_thickness_ratio": 0.12,
+      "max_camber_ratio": 0.04,
+      "max_camber_x": 0.4
+    },
+    "checks": {
+      "thickness_rel_err": 0.000933,
+      "camber_rel_err": 0.0,
+      "camber_x_abs_err": 0.001134
+    }
+  },
+  "S2_ordinates": [
+    {
+      "x_over_c": 0.1,
+      "upper_ref": 0.0638,
+      "upper_calc": 0.0,
+      "lower_ref": -0.0288,
+      "lower_calc": -0.0286,
+      "max_abs_err": 0.0638
+    },
+    {
+      "x_over_c": 0.3,
+      "upper_ref": 0.0974,
+      "upper_calc": 0.0,
+      "lower_ref": -0.0224,
+      "lower_calc": -0.0226,
+      "max_abs_err": 0.0974
+    },
+    {
+      "x_over_c": 0.5,
+      "upper_ref": 0.0918,
+      "upper_calc": 0.0,
+      "lower_ref": -0.014,
+      "lower_calc": -0.014,
+      "max_abs_err": 0.0918
+    },
+    {
+      "x_over_c": 0.7,
+      "upper_ref": 0.0666,
+      "upper_calc": 0.0,
+      "lower_ref": -0.0066,
+      "lower_calc": -0.0065,
+      "max_abs_err": 0.0666
+    },
+    {
+      "x_over_c": 0.9,
+      "upper_ref": 0.0266,
+      "upper_calc": 0.0,
+      "lower_ref": -0.0022,
+      "lower_calc": -0.0021,
+      "max_abs_err": 0.0266
+    },
+    {
+      "x_over_c": 1.0,
+      "upper_ref": 0.0012,
+      "upper_calc": 0.0,
+      "lower_ref": -0.0012,
+      "lower_calc": -0.0012,
+      "max_abs_err": 0.0012
+    }
+  ],
+  "S3_thin_airfoil": {
+    "alpha_L0_deg": -4.154404415443764,
+    "cl_slope_per_rad": 6.283185307179586,
+    "alpha_deg_for_paper_Cl": 12.18,
+    "cl_curve": [
+      {
+        "alpha_deg": 0.0,
+        "cl_thin": 0.4556
+      },
+      {
+        "alpha_deg": 4.0,
+        "cl_thin": 0.8942
+      },
+      {
+        "alpha_deg": 8.0,
+        "cl_thin": 1.3329
+      },
+      {
+        "alpha_deg": 12.0,
+        "cl_thin": 1.7715
+      },
+      {
+        "alpha_deg": 14.0,
+        "cl_thin": 1.9909
+      },
+      {
+        "alpha_deg": 16.0,
+        "cl_thin": 2.2102
+      }
+    ]
+  },
+  "S4_files": {
+    "dat": "runs\\uav-wing-01\\airfoil\\naca4412.dat"
+  }
+}

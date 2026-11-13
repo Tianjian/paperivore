@@ -1,0 +1,11 @@
+{
+  "deck": "runs\\job-0001\\job.inp",
+  "fixed_nodes": 173,
+  "load_nodes": 3085,
+  "force_per_node_N": [
+    0.0,
+    0.0,
+    -0.162075
+  ],
+  "analysis": "STATIC"
+}

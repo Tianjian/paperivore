@@ -1,0 +1,96 @@
+{
+  "nodes": 8975,
+  "elements": 26717,
+  "inner_faces": 8558,
+  "outer_faces": 9170,
+  "geometry": {
+    "r_i": 0.018,
+    "r_o": 0.0195,
+    "L": 0.2
+  },
+  "material": {
+    "k_W_mK": 15.0,
+    "rho_kg_m3": 7900.0,
+    "cp_J_kgK": 477.0
+  },
+  "bc": {
+    "T_gas_in_C": 500.0,
+    "T_gas_out_C": 350.0,
+    "h_i": 100.0,
+    "T_amb_C": 20.0,
+    "h_o": 10.0,
+    "segments": 10
+  },
+  "analytic_segments": [
+    {
+      "z_m": 0.01,
+      "T_gas_C": 492.5,
+      "T_wall_inner_C": 446.359,
+      "T_wall_outer_C": 445.916,
+      "q_W": 10.437
+    },
+    {
+      "z_m": 0.03,
+      "T_gas_C": 477.5,
+      "T_wall_inner_C": 432.824,
+      "T_wall_outer_C": 432.395,
+      "q_W": 10.105
+    },
+    {
+      "z_m": 0.05,
+      "T_gas_C": 462.5,
+      "T_wall_inner_C": 419.289,
+      "T_wall_outer_C": 418.874,
+      "q_W": 9.774
+    },
+    {
+      "z_m": 0.07,
+      "T_gas_C": 447.5,
+      "T_wall_inner_C": 405.753,
+      "T_wall_outer_C": 405.352,
+      "q_W": 9.443
+    },
+    {
+      "z_m": 0.09,
+      "T_gas_C": 432.5,
+      "T_wall_inner_C": 392.218,
+      "T_wall_outer_C": 391.831,
+      "q_W": 9.112
+    },
+    {
+      "z_m": 0.11,
+      "T_gas_C": 417.5,
+      "T_wall_inner_C": 378.683,
+      "T_wall_outer_C": 378.31,
+      "q_W": 8.78
+    },
+    {
+      "z_m": 0.13,
+      "T_gas_C": 402.5,
+      "T_wall_inner_C": 365.148,
+      "T_wall_outer_C": 364.789,
+      "q_W": 8.449
+    },
+    {
+      "z_m": 0.15,
+      "T_gas_C": 387.5,
+      "T_wall_inner_C": 351.613,
+      "T_wall_outer_C": 351.268,
+      "q_W": 8.118
+    },
+    {
+      "z_m": 0.17,
+      "T_gas_C": 372.5,
+      "T_wall_inner_C": 338.077,
+      "T_wall_outer_C": 337.747,
+      "q_W": 7.786
+    },
+    {
+      "z_m": 0.19,
+      "T_gas_C": 357.5,
+      "T_wall_inner_C": 324.542,
+      "T_wall_outer_C": 324.226,
+      "q_W": 7.455
+    }
+  ]
+}

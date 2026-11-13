@@ -1,0 +1,18 @@
+{
+  "mesh_file": "runs\\uav-wing-02\\wing\\mesh.msh",
+  "nodes": 30311,
+  "elements": 91088,
+  "element_type": "C3D4",
+  "root_nodes": 274,
+  "top_nodes": 6762,
+  "top_faces": {
+    "1": 5165,
+    "2": 3700,
+    "3": 2464,
+    "4": 1817
+  },
+  "top_elements": 13146,
+  "tip_nodes": 274,
+  "pressure_MPa": 0.00142697,
+  "expected_total_lift_N": 513.708
+}

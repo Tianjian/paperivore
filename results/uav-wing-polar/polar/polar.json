@@ -1,0 +1,184 @@
+{
+  "paper": {
+    "title": "Performance analysis of NACA 2412 and NACA 4412 airfoils (CFD)",
+    "journal": "Journal of Thermal Engineering 10(6): 1524-1538, 2024",
+    "doi": "10.14744/thermal.0000892",
+    "license": "CC BY-NC",
+    "cl": {
+      "NACA 4412": {
+        "0.0": 0.412,
+        "5.0": 0.912,
+        "10.0": 1.26,
+        "15.0": 1.24,
+        "20.0": 0.908
+      },
+      "NACA 2412": {
+        "0.0": 0.0589,
+        "5.0": 0.7429,
+        "10.0": 1.1591,
+        "15.0": 0.8412,
+        "20.0": 0.435
+      }
+    },
+    "cd": {
+      "NACA 4412": {
+        "0.0": 0.107,
+        "5.0": 0.0421,
+        "10.0": 0.0685,
+        "15.0": 0.172,
+        "20.0": 0.2
+      },
+      "NACA 2412": {
+        "0.0": 0.2316,
+        "5.0": 0.03056,
+        "10.0": 0.05124,
+        "15.0": 0.1522,
+        "20.0": 0.348
+      }
+    },
+    "conditions": {
+      "V_m_s": 43.0,
+      "rho": 1.225,
+      "chord_m": 0.1,
+      "alpha_deg": [
+        0,
+        5,
+        10,
+        15,
+        20
+      ]
+    }
+  },
+  "geometry": {
+    "NACA 2412": {
+      "airfoil": "NACA 2412",
+      "m": 0.02,
+      "p": 0.4,
+      "t": 0.12,
+      "max_thickness_ratio": 0.119996,
+      "max_thickness_x": 0.300353,
+      "max_camber_ratio": 0.02,
+      "max_camber_x": 0.398849
+    },
+    "NACA 4412": {
+      "airfoil": "NACA 4412",
+      "m": 0.04,
+      "p": 0.4,
+      "t": 0.12,
+      "max_thickness_ratio": 0.119888,
+      "max_thickness_x": 0.307721,
+      "max_camber_ratio": 0.04,
+      "max_camber_x": 0.398866
+    }
+  },
+  "aerodynamics": {
+    "NACA 2412": {
+      "alpha_L0_deg": -2.077202207721882,
+      "slope_per_rad": 6.283185307179586,
+      "rows": [
+        {
+          "alpha_deg": 0,
+          "cl_paper": 0.0589,
+          "cl_thin": 0.2278,
+          "abs_err": 0.1689,
+          "rel_err_pct": 286.7
+        },
+        {
+          "alpha_deg": 5,
+          "cl_paper": 0.7429,
+          "cl_thin": 0.7761,
+          "abs_err": 0.0332,
+          "rel_err_pct": 4.5
+        },
+        {
+          "alpha_deg": 10,
+          "cl_paper": 1.1591,
+          "cl_thin": 1.3244,
+          "abs_err": 0.1653,
+          "rel_err_pct": 14.3
+        },
+        {
+          "alpha_deg": 15,
+          "cl_paper": 0.8412,
+          "cl_thin": 1.8727,
+          "abs_err": 1.0315,
+          "rel_err_pct": 122.6
+        },
+        {
+          "alpha_deg": 20,
+          "cl_paper": 0.435,
+          "cl_thin": 2.421,
+          "abs_err": 1.986,
+          "rel_err_pct": 456.6
+        }
+      ]
+    },
+    "NACA 4412": {
+      "alpha_L0_deg": -4.154404415443764,
+      "slope_per_rad": 6.283185307179586,
+      "rows": [
+        {
+          "alpha_deg": 0,
+          "cl_paper": 0.412,
+          "cl_thin": 0.4556,
+          "abs_err": 0.0436,
+          "rel_err_pct": 10.6
+        },
+        {
+          "alpha_deg": 5,
+          "cl_paper": 0.912,
+          "cl_thin": 1.0039,
+          "abs_err": 0.0919,
+          "rel_err_pct": 10.1
+        },
+        {
+          "alpha_deg": 10,
+          "cl_paper": 1.26,
+          "cl_thin": 1.5522,
+          "abs_err": 0.2922,
+          "rel_err_pct": 23.2
+        },
+        {
+          "alpha_deg": 15,
+          "cl_paper": 1.24,
+          "cl_thin": 2.1005,
+          "abs_err": 0.8605,
+          "rel_err_pct": 69.4
+        },
+        {
+          "alpha_deg": 20,
+          "cl_paper": 0.908,
+          "cl_thin": 2.6488,
+          "abs_err": 1.7408,
+          "rel_err_pct": 191.7
+        }
+      ]
+    }
+  },
+  "lift_slope_per_deg": {
+    "paper": {
+      "NACA 2412": 0.11002,
+      "NACA 4412": 0.0848
+    },
+    "thin_airfoil": 0.10966,
+    "rel_err_pct": {
+      "NACA 2412": 0.3,
+      "NACA 4412": -22.7
+    }
+  },
+  "drag": {
+    "NACA 2412": {
+      "cd_min": 0.03056,
+      "cd_min_alpha": 5.0,
+      "plausible_order": true,
+      "note": "viscous quantity: not computable by this inviscid toolchain"
+    },
+    "NACA 4412": {
+      "cd_min": 0.0421,
+      "cd_min_alpha": 5.0,
+      "plausible_order": true,
+      "note": "viscous quantity: not computable by this inviscid toolchain"
+    }
+  },
+  "scope_note": "CL compared; CD only screened for plausibility (no viscous solver locally)"
+}

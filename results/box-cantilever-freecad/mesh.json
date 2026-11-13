@@ -1,0 +1,10 @@
+{
+  "msh": "runs\\job-0005\\part.msh",
+  "inp": "runs\\job-0005\\part.inp",
+  "groups": "runs\\job-0005\\groups.json",
+  "nodes": 9378,
+  "volume_elements": 5477,
+  "element_order": 2,
+  "nodes_fixed": 77,
+  "nodes_load": 925
+}

@@ -1,0 +1,24 @@
+{
+  "paper": {
+    "doi": "arXiv:2509.23561",
+    "Kt_meas_mNm_A": 32.0,
+    "R_meas_ohm": 4.7,
+    "T_stall_mNm": 158,
+    "I_stall_A": 5.95
+  },
+  "geometry": {
+    "poles": 10,
+    "r_o": 0.0095,
+    "r_i": 0.0035,
+    "pcb_t": 0.006,
+    "gap": 0.00025,
+    "h_m_assumed": 0.001,
+    "step": "runs\\afpm-01\\afpm\\afpm.step"
+  },
+  "Bg_fem_T": 0.379,
+  "Bg_circuit_T": 0.1793,
+  "flux_per_pole_Wb": 9.29e-06,
+  "Kt_at_N216_mNm_A": 15.045,
+  "N_implied_from_meas": 459.4,
+  "N_from_table": 216.0
+}

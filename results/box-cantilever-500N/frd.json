@@ -1,0 +1,8 @@
+{
+  "arrays": [
+    "DISP",
+    "STRESS"
+  ],
+  "n_points": 35510,
+  "n_cells": 22333
+}
