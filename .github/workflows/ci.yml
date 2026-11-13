@@ -38,3 +38,27 @@ jobs:
         run: |
           python -m compileall -q scripts
           echo "all scripts compile"
+
+  bench-windows:
+    name: bench (Windows, py3.12)
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install the pure-python part of the toolchain
+        run: |
+          python -m pip install --upgrade pip
+          pip install numpy scipy matplotlib pytest
+
+      - name: Run the validation bench
+        run: pytest -q
+
+      - name: Smoke-test that every script still compiles
+        run: |
+          python -m compileall -q scripts
+          echo "all scripts compile"

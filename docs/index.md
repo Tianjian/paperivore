@@ -7,7 +7,7 @@ your physics.
 
 | # | Case | What it proves | Verdict | Report |
 |---|---|---|---|---|
-| 0 | Windows toolchain | build123d · gmsh · CalculiX · PyVista wired together, pitfalls catalogued | ✅ | [Toolchain report](CAD-CAE-Windows-Toolchain-Report.md) |
+| 0 | Toolchain (Windows baseline) | build123d · gmsh · CalculiX · PyVista wired together, pitfalls catalogued; Python core also runs on Ubuntu (CI) | ✅ | [Toolchain report](CAD-CAE-Windows-Toolchain-Report.md) |
 | 0b | FreeCAD | where a GUI CAD actually helps, and why headless drawing export fails | ⚠️ conditional | [Postmortem](FreeCAD-necessity-and-deployment-postmortem.md) |
 | 1 | NACA 4412 wing | airfoil geometry + box-spar FEA against beam theory | ✅ | [Report](Airfoil-Validation-Report.md) |
 | 2 | NACA 2412 / 4412 polars | 10 lift points, lift-curve slope, stall onset | ✅ | [Report](Airfoil-Validation-2-Report.md) |

@@ -5,6 +5,9 @@
 > 目标：在 Windows 本机搭建**全开源**、**Agent 友好**（可被 LLM 以文件 + CLI 方式可靠驱动）的机械 CAD / CAE 工具链
 > 结论先行：**可以完整搭建，而且不需要任何商业软件。** 唯一必须接受的取舍是"用代码建模（CAD-as-Code）而不是点鼠标建模"。
 
+> **平台说明（2026-11）**：本报告记录最初的 Windows 11 基线；Python 核心（以及
+> GetDP / CalculiX 案例）也可在 Ubuntu 上运行，CI 会在 Windows 与 Ubuntu 上跑纯 Python 基准。
+
 ---
 
 ## 0. 一页结论

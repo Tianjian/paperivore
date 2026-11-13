@@ -8,7 +8,7 @@
 
 [![License: MIT](https://img.shields.io/badge/code-MIT-blue.svg)](LICENSE)
 [![ci](https://github.com/Tianjian/paperivore/actions/workflows/ci.yml/badge.svg)](https://github.com/Tianjian/paperivore/actions/workflows/ci.yml)
-![Platform: Windows](https://img.shields.io/badge/platform-Windows%2010%2F11-lightgrey)
+![Platform: Windows / Ubuntu](https://img.shields.io/badge/platform-Windows%20%7C%20Ubuntu-lightgrey)
 ![Stack: 100% open source](https://img.shields.io/badge/stack-100%25%20open%20source-brightgreen)
 
 </div>
@@ -32,7 +32,7 @@ things is true, and finding out which is the actual work:
 Nothing is tuned to match. A failed case stays failed in the ledger.
 
 **Scope so far:** structural FEA, heat transfer, blade-element aerodynamics, thin-airfoil
-theory, and (new) 2D magnetostatics — all on Windows, all open source.
+theory, and (new) 2D magnetostatics — on Windows and Ubuntu, all open source.
 
 ---
 
@@ -137,6 +137,25 @@ Push-Location results\box-cantilever-500N; ccx_i8.exe -i job; Pop-Location
 .venv\Scripts\python scripts\render.py --job results\box-cantilever-500N
 ```
 
+### Ubuntu / Linux
+
+```bash
+git clone https://github.com/Tianjian/paperivore.git
+cd paperivore
+sudo apt install python3-venv          # once
+python3 -m venv .venv && . .venv/bin/activate
+pip install -r requirements.txt
+
+# Solver side (optional, per case):
+#   CalculiX: sudo apt install calculix-ccx   -> binary `ccx`
+#   GetDP:    ./scripts/getdp_bootstrap.sh    -> ~/.cache/paperivore/getdp
+pytest -q                              # 35 pure-Python tests, no solver needed
+```
+
+The Python entry points are identical; replace `.venv\Scripts\python` with
+`.venv/bin/python` and `ccx_i8.exe` with `ccx`.  The PowerShell helpers
+(`scripts/run_job.ps1` and friends) are Windows-only convenience wrappers.
+
 Every case in the ledger has its exact command block inside its report in `docs/`.
 
 ### Run the bench without a solver
@@ -216,7 +235,9 @@ skill/       the agent-facing SOP (how to drive the pipeline, and every pitfall 
   reference — the remaining 0.168 % is mostly a post-processing convention (segment
   average vs midpoint); the genuine 1-D-vs-2-D axial-conduction effect is ≈1.1–1.5 %.
 - **No radiation, no conjugate heat transfer, no contact, no composites layup.**
-- **Windows-first.** Scripts use PowerShell; the Python side is portable.
+- **Windows-first UX, cross-platform core.** The PowerShell helpers (`run_job.ps1` etc.)
+  are Windows-only; the Python/gmsh/CalculiX/GetDP pipeline runs on Windows and Ubuntu, and
+  CI runs the pure-Python bench on both.
 
 ---
 
@@ -283,6 +304,6 @@ regenerated accordingly:
 ---
 
 <div align="center">
-<sub>Built on Windows with an agent in the loop — every number in this repo was produced by
+<sub>Built on Windows and Ubuntu with an agent in the loop — every number in this repo was produced by
 running the code, not by copying a table.</sub>
 </div>

@@ -1,6 +1,25 @@
-# Setting up the toolchain (Windows)
+# Setting up the toolchain (Windows / Ubuntu)
 
-Everything below is free and open source. Total install ≈ 1.5 GB, mostly MSYS2.
+Everything below is free and open source. Total install ≈ 1.5 GB, mostly MSYS2 on
+Windows; the Ubuntu path uses distro packages and the portable Python wheel set.
+
+## 0. Ubuntu / Linux (short version)
+
+The Python bench is identical; only the solver binaries differ.
+
+```bash
+sudo apt install python3-venv
+python3 -m venv .venv && . .venv/bin/activate
+pip install -r requirements.txt
+# optional, per case:
+#   CalculiX: sudo apt install calculix-ccx   -> binary `ccx`
+#   GetDP:    ./scripts/getdp_bootstrap.sh    -> ~/.cache/paperivore/getdp
+pytest -q
+```
+
+The PowerShell helpers (`scripts/run_job.ps1` etc.) are Windows-only convenience
+wrappers; on Linux call the Python entry points directly (each report has the command
+block).  The Windows sections below remain the reference for that path.
 
 ## 1. Python
 
