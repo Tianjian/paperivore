@@ -1,0 +1,40 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  bench:
+    name: bench (py${{ matrix.python-version }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.11", "3.12", "3.13"]
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: pip
+
+      - name: Install the pure-python part of the toolchain
+        run: |
+          python -m pip install --upgrade pip
+          pip install numpy scipy matplotlib pytest
+
+      - name: Run the validation bench
+        run: pytest -q
+
+      - name: Smoke-test that every script still compiles
+        run: |
+          python -m compileall -q scripts
+          echo "all scripts compile"

@@ -7,6 +7,7 @@
 *Every paper is a meal. Every meal is a test. Every failed test becomes a fix.*
 
 [![License: MIT](https://img.shields.io/badge/code-MIT-blue.svg)](LICENSE)
+[![ci](https://github.com/Tianjian/paperivore/actions/workflows/ci.yml/badge.svg)](https://github.com/Tianjian/paperivore/actions/workflows/ci.yml)
 ![Platform: Windows](https://img.shields.io/badge/platform-Windows%2010%2F11-lightgrey)
 ![Stack: 100% open source](https://img.shields.io/badge/stack-100%25%20open%20source-brightgreen)
 
@@ -130,6 +131,20 @@ Push-Location results\box-cantilever-500N; ccx_i8.exe -i job; Pop-Location
 
 Every case in the ledger has its exact command block inside its report in `docs/`.
 
+### Run the bench without a solver
+
+The numerical core (airfoil theory, BEM, thermal references, magnetic circuit) is pure
+Python — no CalculiX, no gmsh, no CAD kernel:
+
+```powershell
+pip install numpy scipy pytest
+pytest -q          # 25 tests, < 2 s
+```
+
+These tests pin the golden values the reports quote. If a refactor moves a baseline, CI
+fails before the docs go stale — that is exactly how the (wrong) `Cp` row in the wind-blade
+report was caught.
+
 ---
 
 ## Repository map
@@ -139,6 +154,7 @@ docs/        one report per paper — parameters, method, results, verdict, limi
 papers/      the PDFs themselves + licence/provenance table
 results/     curated run artefacts per case (json, png, csv, step) — no meshes or solver dumps
 scripts/     the toolchain: model → mesh → deck → solve → post → plots
+tests/       golden-value regression tests for the pure-python part (runs in CI)
 skill/       the agent-facing SOP (how to drive the pipeline, and every pitfall found)
 ```
 
@@ -147,6 +163,7 @@ skill/       the agent-facing SOP (how to drive the pipeline, and every pitfall 
 | `docs/` | [toolchain report](docs/CAD-CAE-Windows-Toolchain-Report.md) · [airfoil #1](docs/Airfoil-Validation-Report.md) · [airfoil #2](docs/Airfoil-Validation-2-Report.md) · [wind blade](docs/Wind-Blade-Validation-Report.md) · [thermal](docs/Thermal-Pipe-Validation-Report.md) · [motor](docs/AFPM-EM-Validation-Report.md) |
 | `papers/` | [provenance & licences](papers/README.md) |
 | `results/` | [result index](results/README.md) |
+| `tests/` | `pytest -q` — 25 golden-value checks, also run by [CI](.github/workflows/ci.yml) |
 | `skill/` | [SKILL.md](skill/cad-cae/SKILL.md) — the operational checklist |
 
 ---
