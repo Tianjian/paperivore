@@ -82,6 +82,18 @@ coefficients by a consistent reference area.
 
 ---
 
+## Gallery
+
+| 25 m wind-turbine blade (BEM + FEA) | PCB axial-flux motor (magnetostatic FEM) |
+|---|---|
+| ![blade](results/wind-blade-25m/viz/blade_3d_rotor.png) | ![motor](results/afpm-pcb-motor/viz/afpm_3d.png) |
+
+| Exhaust-pipe temperature field | Airfoil polars: paper vs thin-airfoil theory |
+|---|---|
+| ![thermal](results/exhaust-pipe-gradient/viz/thermal_3d.png) | ![polars](results/uav-wing-polar/polar/polar_compare.png) |
+
+---
+
 ## Where the numbers come from
 
 | Capability | Validator | Measured accuracy |
