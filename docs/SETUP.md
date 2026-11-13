@@ -46,6 +46,21 @@ On this machine the default `ccx.exe` dies with `0xC0000005` (access violation) 
 PaStiX during the first solve. The `ccx_i8` (integer-8) build solves the same deck in
 seconds. Always call `ccx_i8.exe -i <jobname>`.
 
+## 2b. GetDP (AFPM case)
+
+`scripts/afpm_getdp.py` needs a `getdp` (or `getdp-sparskit`) binary; CalculiX is not enough.
+On Ubuntu/Debian a rootless install is provided:
+
+```bash
+./scripts/getdp_bootstrap.sh          # apt-get download + dpkg -x into ~/.cache/paperivore/getdp
+# then:
+GETDP=~/.cache/paperivore/getdp/root/usr/bin/getdp-sparskit \
+  python scripts/afpm_getdp.py --job results/afpm-pcb-motor/getdp2d
+```
+
+On Windows, install GetDP from <https://getdp.info> (or ONELAB) and pass `--getdp <path>`.
+`getdp --version` should print 3.x.
+
 ## 3. FreeCAD (optional — human review only)
 
 The pipeline never needs FreeCAD; it is used to open a `STEP`, browse the model, and export

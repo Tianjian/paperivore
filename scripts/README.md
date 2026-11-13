@@ -47,6 +47,8 @@ Uses **SI units** (m, N, Pa, kg, s, K) — the only scripts that do.
 | Script | Purpose | Usage |
 |---|---|---|
 | `afpm_model.py` | AFPM 3D geometry; 2D magnetostatic solver (scalar potential, periodic BC) + dual-rotor 1-D circuit | `geom` / `field --job results/afpm-pcb-motor` (`field` writes `Bg_fem_T`, `Bg_circuit_T`, `flux_per_pole_{fem,circuit}_Wb`) |
+| `afpm_getdp.py` | **full-stack 2D** magnetostatics with GetDP (A_z, conforming mesh, layer-averaged coil flux) | `--job results/afpm-pcb-motor/getdp2d [--multi-slice 5]` (needs a `getdp` binary) |
+| `getdp_bootstrap.sh` | rootless GetDP install (Ubuntu/Debian: apt download + dpkg -x) | `./scripts/getdp_bootstrap.sh` then `GETDP=... python scripts/afpm_getdp.py ...` |
 | `afpm_viz.py` | assembly render, r-z section, `Kt(N, h_m)` study | `--job results/afpm-pcb-motor` |
 
 ## Drawing / projection (optional)

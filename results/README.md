@@ -14,7 +14,7 @@ plots shown in the reports (`png`), and the CAD output (`step`). Meshes, solver 
 | `wind-blade-25m/` | Round 3: 25 m blade, Glauert chord/twist, BEM, solid FEA | `bem/bem.json`, `fea/result.json` | `viz/cp_tsr.png`, `viz/blade_3d_rotor.png` |
 | `exhaust-pipe-gradient/` | Round 4: pipe with axial gas gradient (500 → 350 °C) | `thermal/result.json` (0.168 % vs fin) | `viz/thermal_3d.png`, `viz/thermal_2d.png` |
 | `exhaust-pipe-uniform/` | Round 4: uniform gas temperature, exact-solution check | `thermal/result.json` (0.001 %) | `viz/thermal_2d.png` |
-| `afpm-pcb-motor/` | Round 5: PCB axial-flux motor, corrected dual-rotor circuit + 2D field | `afpm/result.json` (`Kt` −53 % FEA / −62 % circuit) | `viz/afpm_3d.png`, `viz/field_2d.png`, `viz/kt_study.png` |
+| `afpm-pcb-motor/` | Round 5: PCB axial-flux motor, dual-rotor circuit + full-stack GetDP 2D field | `afpm/result.json`; `getdp2d/{result,multislice}.json` (`Kt` ≈3.1 mNm/A at 216 turns) | `viz/afpm_3d.png`, `viz/field_2d.png`, `viz/kt_study.png` |
 
 ## Reading a result file
 
@@ -26,6 +26,7 @@ The schema depends on the case; each report documents its own keys:
 | `uav-wing-*/wing/` | `{fea, beam_theory, deflection_profile, sections, error, note}` — `sections` compares element-averaged S33 with beam theory. |
 | `exhaust-pipe-*/thermal/` | `{segments: [...], max_err_inner_pct, max_err_outer_pct, max_err_fin_pct}`. |
 | `afpm-pcb-motor/afpm/` | `{paper, geometry, topology_note, Bg_fem_T, Bg_circuit_T, flux_per_pole_fem_Wb, flux_per_pole_circuit_Wb, Kt_at_N216_*_mNm_A, N_implied_from_meas_*, N_from_table}`. |
+| `afpm-pcb-motor/getdp2d/` | `{geometry, B_mid, B_gap, B_near_surface, layers[], flux_per_m_layer_avg_Wb_per_m, flux_per_pole_Wb, Kt_mNm_A}` — plus `multislice.json`. |
 | `wind-blade-25m/` | `blade/design.json` (rows), `bem/bem.json` (cp_sweep, power_curve, check), `fea/{mesh,result}.json`. |
 
 A field that is `null` or missing means the case did not produce it — that is usually the

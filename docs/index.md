@@ -38,5 +38,6 @@ conventions, and the sanity-check command that must reproduce `0.0708 mm` at 500
 - **Wind blade**: BEM gets `Cp` within 11 %; the φ convention of the design law costs ~3–6 pp, the low-TSR post-stall polar the rest.
 - **Thermal**: 0.001 % against an exact solution (a conformance test of `*FILM`) — and a 1.7 % "error" that was the
   reference model's fault; most of the remaining 0.168 % is post-processing convention.
-- **Motor**: the toolchain can now compute magnetic fields, and immediately found that
-  the paper's own parameter set cannot reproduce its measured torque constant (`Kt` −53 % on the 2-D field, −62 % on the corrected dual-rotor circuit).
+- **Motor**: a full-stack GetDP model now computes the field, and it shows the 6 mm PCB's
+  inter-pole leakage: at 216 turns `Kt` ≈ 3.1 mNm/A vs the measured 32; the case is *not
+  verifiable* because the paper lacks magnet thickness, PCB stack and winding data.

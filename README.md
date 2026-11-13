@@ -74,7 +74,7 @@ kept in this repository as the receipts.
 | 3 | NACA 2412 / 4412 polars (J. Thermal Eng. 2024) | 10 lift points, lift-curve slope, stall trend | ✅ pass | pre-stall **4.5 – 23 %**; slope **+0.3 %** as a 0–10° fit (5–10° alone: −24 %); stall divergence expected |
 | 4 | 25 m HAWT blade (RERA 2026) | Glauert design, BEM `Cp–TSR`, power curve, solid FEA | ✅ pass / ⚠️ | `Cp` **−11 %** (design-law φ ≈3–6 pp + quadrature); 9 m/s power **−8.9 %**; 14 m/s power **−21.5 %** (post-stall polar; −0.5 % with Viterna) |
 | 5 | Exhaust pipe (Thermal Science 2010) | steady conduction + two-sided convection (`*FILM`) | ✅ pass | **0.001 %** vs exact 1D (conformance test); **0.168 %** vs fin solution (≈96 % post-processing convention) |
-| 6 | PCB axial-flux motor (arXiv 2509.23561) | corrected dual-rotor circuit + custom 2D magnetostatics | ❌ fail (honest) | `Kt` **−53 %** (FEA) / **−62 %** (circuit), `R` **−40 %** — paper lacks magnet thickness / turn definition |
+| 6 | PCB axial-flux motor (arXiv 2509.23561) | full-stack 2D magnetostatics (GetDP) + dual-rotor circuit | ❌ not verifiable | 216-turn field gives `Kt` **≈3.1 mNm/A** vs measured 32 (−90 %); `R` −40 %; needs ≈2 200 turns or a different geometry — paper lacks magnet thickness / PCB stack / winding definition |
 
 **Rejected prey** (screened out, kept in `papers/` for transparency): `exhaust_manifold.pdf`
 does contain a steady-state thermal study, but the temperature field is shown only as
@@ -107,7 +107,7 @@ pre-stall, internally consistent points and the anomaly is recorded in its repor
 | Heat conduction + convection | CalculiX `*HEAT TRANSFER` vs closed-form | **0.001 %** (uniform), **0.168 %** (axial gradient, fin reference) |
 | Lifting-line / thin airfoil | own implementation vs paper polars | slope **0.3 %** (0–10° fit), `Cl` pre-stall **4.5 – 23 %** |
 | Blade-element momentum | own BEM vs paper `Cp–TSR` | `Cp,max` **−11 %**, power at 9 m/s **−8.9 %** |
-| 2D magnetostatics | own scalar-potential FEM vs corrected dual-rotor circuit | **≈22 %** disagreement (the old single-rotor formula gave 111 %); periodic BC fixed |
+| 2D magnetostatics | **GetDP full-stack A_z** vs dual-rotor 1-D circuit | gap field matches the 1-D circuit to **0.7 %** in the wide-pitch limit; for the real 6 mm PCB the through-PCB flux is only ≈22 % of the 1-D circuit (inter-pole leakage) |
 
 ---
 
@@ -146,7 +146,7 @@ Python — no CalculiX, no gmsh, no CAD kernel:
 
 ```powershell
 pip install numpy scipy pytest
-pytest -q          # 28 tests, < 2 s
+pytest -q          # 31 tests, < 2 s
 ```
 
 These tests pin the golden values the reports quote. If a refactor moves a baseline, CI
@@ -171,7 +171,7 @@ skill/       the agent-facing SOP (how to drive the pipeline, and every pitfall 
 | `docs/` | [toolchain report](docs/CAD-CAE-Windows-Toolchain-Report.md) · [airfoil #1](docs/Airfoil-Validation-Report.md) · [airfoil #2](docs/Airfoil-Validation-2-Report.md) · [wind blade](docs/Wind-Blade-Validation-Report.md) · [thermal](docs/Thermal-Pipe-Validation-Report.md) · [motor](docs/AFPM-EM-Validation-Report.md) |
 | `papers/` | [provenance & licences](papers/README.md) |
 | `results/` | [result index](results/README.md) |
-| `tests/` | `pytest -q` — 28 golden-value checks, also run by [CI](.github/workflows/ci.yml) |
+| `tests/` | `pytest -q` — 31 golden-value checks, also run by [CI](.github/workflows/ci.yml) |
 | `skill/` | [SKILL.md](skill/cad-cae/SKILL.md) — the operational checklist |
 
 ---
@@ -208,9 +208,8 @@ skill/       the agent-facing SOP (how to drive the pipeline, and every pitfall 
 
 - **No viscous CFD.** Aerodynamics is BEM + thin-airfoil + panel-level methods. No drag
   prediction, no separation, no stall onset.
-- **No 3D electromagnetics.** The 2D magnetostatic solver cannot close the flux path of a
-  single-stator axial-flux machine (the return path is radial); that case is deliberately
-  reported as a known-inadequate model rather than a passing one.
+- **No 3D electromagnetics.** A full-stack 2D GetDP model now exists, but the radial return
+  path still needs 3D; the AFPM case is reported as *not verifiable* rather than passing.
 - **2D heat transfer ignores what 2D ignores.** Solved by adding an axial-conduction fin
   reference — the remaining 0.168 % is mostly a post-processing convention (segment
   average vs midpoint); the genuine 1-D-vs-2-D axial-conduction effect is ≈1.1–1.5 %.
@@ -255,7 +254,12 @@ regenerated accordingly:
 - `thermal_pipe.py`: `build123d` is imported only when the STEP actually has to be
   generated; `blade_fea.py` counts elements correctly; `blade_geometry.py` wires `--rhub`
   and its docstrings now state the implemented φ/chord convention; `smoke.inp` exists.
-- Regression tests: 25 → 28 (airfoil S2, AFPM circuit/turns, BEM parameters).
+- **AFPM**: new `scripts/afpm_getdp.py` implements the full-stack 2D magnetostatics (GetDP A_z,
+  material-conforming mesh, both rotors, layer-averaged coil flux).  It shows that the old
+  half-cell model forced the through-PCB flux: for the real 6 mm PCB the inter-pole leakage
+  dominates and `Kt` at 216 turns drops from 14.95 to **3.07 mNm/A**; the AFPM case is
+  reclassified as **not verifiable** (paper lacks magnet thickness / PCB stack / winding).
+- Regression tests: 25 → 31 (airfoil S2, AFPM circuit/turns, BEM parameters, GetDP post-processing).
 
 ## Licence
 
