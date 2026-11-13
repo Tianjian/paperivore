@@ -46,7 +46,7 @@ Uses **SI units** (m, N, Pa, kg, s, K) — the only scripts that do.
 
 | Script | Purpose | Usage |
 |---|---|---|
-| `afpm_model.py` | AFPM 3D geometry; 2D magnetostatic solver (scalar potential, periodic BC) + dual-rotor 1-D circuit | `geom` / `field --job results/afpm-pcb-motor` (`field` writes `Bg_fem_T`, `Bg_circuit_T`, `flux_per_pole_{fem,circuit}_Wb`) |
+| `afpm_model.py` | AFPM 3D geometry; **legacy** half-cell 2D solver (scalar potential) + dual-rotor 1-D circuit — field values superseded by `afpm_getdp.py` | `geom` / `field --job results/afpm-pcb-motor` (`field` writes `Bg_fem_T`, `Bg_circuit_T`, `flux_per_pole_{fem,circuit}_Wb`) |
 | `afpm_getdp.py` | **full-stack 2D** magnetostatics with GetDP (A_z, conforming mesh, layer-averaged coil flux) | `--job results/afpm-pcb-motor/getdp2d [--multi-slice 5]` (needs a `getdp` binary) |
 | `afpm_getdp3d.py` | **3D one-pole-pair slab** (scalar potential, air margins) for the AFPM case | `--job results/afpm-pcb-motor/getdp3d` (needs `getdp`) |
 | `afpm_getdp3d_sector.py` | **3D 36° annular sector** (one pole, true radial pitch, scalar potential) | `--job results/afpm-pcb-motor/getdp3d-sector` (needs `getdp`) |

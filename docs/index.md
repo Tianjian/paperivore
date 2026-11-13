@@ -27,7 +27,7 @@ conventions, and the sanity-check command that must reproduce `0.0708 mm` at 500
 | ✅ | the number lands inside the stated tolerance and the tolerance is justified |
 | ⚠️ | partly reproduced, with the residual explained |
 | ❌ | not reproduced — and the report says why, with evidence |
-| ➖ | not verifiable with this toolchain (no viscous CFD, no 3D EM, …) |
+| ➖ | not verifiable with this toolchain (no viscous CFD, simplified full-pitch winding, …) |
 
 ## The one-line summary of every report
 
@@ -39,5 +39,6 @@ conventions, and the sanity-check command that must reproduce `0.0708 mm` at 500
 - **Thermal**: 0.001 % against an exact solution (a conformance test of `*FILM`) — and a 1.7 % "error" that was the
   reference model's fault; most of the remaining 0.168 % is post-processing convention.
 - **Motor**: a full-stack GetDP model now computes the field, and it shows the 6 mm PCB's
-  inter-pole leakage: at 216 turns `Kt` ≈ 3.1 mNm/A (2D), 2.84 (3D slab) vs the measured 32;
-  the case is *not verifiable* because the paper lacks magnet thickness, PCB stack and winding data.
+  inter-pole leakage: at 216 turns `Kt` ≈ 3.1 mNm/A (2D), 2.84 (3D slab), **2.60 (3D annular
+  sector)** vs the measured 32; the case is *not verifiable* because the paper lacks magnet
+  thickness, PCB stack and winding data.

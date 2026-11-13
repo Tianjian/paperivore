@@ -14,7 +14,7 @@ plots shown in the reports (`png`), and the CAD output (`step`). Meshes, solver 
 | `wind-blade-25m/` | Round 3: 25 m blade, Glauert chord/twist, BEM, solid FEA | `bem/bem.json`, `fea/result.json` | `viz/cp_tsr.png`, `viz/blade_3d_rotor.png` |
 | `exhaust-pipe-gradient/` | Round 4: pipe with axial gas gradient (500 → 350 °C) | `thermal/result.json` (0.168 % vs fin) | `viz/thermal_3d.png`, `viz/thermal_2d.png` |
 | `exhaust-pipe-uniform/` | Round 4: uniform gas temperature, exact-solution check | `thermal/result.json` (0.001 %) | `viz/thermal_2d.png` |
-| `afpm-pcb-motor/` | Round 5: PCB axial-flux motor, dual-rotor circuit + full-stack GetDP 2D field | `afpm/result.json`; `getdp2d/{result,multislice}.json` (`Kt` ≈3.1 mNm/A at 216 turns) | `viz/afpm_3d.png`, `viz/field_2d.png`, `viz/kt_study.png` |
+| `afpm-pcb-motor/` | Round 5: PCB axial-flux motor, dual-rotor circuit + full-stack 2D / B-H / 3D GetDP fields | `afpm/result.json` (legacy half-model); `getdp2d/{result,multislice}.json`, `getdp2d-bh/result.json`, `getdp3d/result.json`, `getdp3d-sector/result.json` (`Kt` 3.07 / 3.15 / 3.08 / 2.84 / **2.60** mNm/A at 216 turns) | `viz/afpm_3d.png`, `viz/field_2d.png`, `viz/kt_study.png` |
 
 ## Reading a result file
 
@@ -28,7 +28,7 @@ The schema depends on the case; each report documents its own keys:
 | `afpm-pcb-motor/getdp3d/` | `{geometry, nph, flux_per_pole_Wb, Kt_mNm_A, slices[]}` (3D slab). |
 | `afpm-pcb-motor/getdp3d-sector/` | `{geometry, nph, flux_per_pole_Wb, Kt_mNm_A, layers[]}` (3D annular sector). |
 | `afpm-pcb-motor/getdp2d-bh/` | same as `getdp2d/` plus `bh:{iters, mur_iron, B_iron_mean_T}`. |
-| `afpm-pcb-motor/afpm/` | `{paper, geometry, topology_note, Bg_fem_T, Bg_circuit_T, flux_per_pole_fem_Wb, flux_per_pole_circuit_Wb, Kt_at_N216_*_mNm_A, N_implied_from_meas_*, N_from_table}`. |
+| `afpm-pcb-motor/afpm/` | **Legacy half-model** (field values superseded by `getdp2d/`): `{paper, geometry, topology_note, Bg_fem_T, Bg_circuit_T, flux_per_pole_fem_Wb, flux_per_pole_circuit_Wb, Kt_at_N216_*_mNm_A, N_implied_from_meas_*, N_from_table}`. |
 | `afpm-pcb-motor/getdp2d/` | `{geometry, B_mid, B_gap, B_near_surface, layers[], flux_per_m_layer_avg_Wb_per_m, flux_per_pole_Wb, Kt_mNm_A}` — plus `multislice.json`. |
 | `wind-blade-25m/` | `blade/design.json` (rows), `bem/bem.json` (cp_sweep, power_curve, check), `fea/{mesh,result}.json`. |
 

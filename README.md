@@ -208,8 +208,10 @@ skill/       the agent-facing SOP (how to drive the pipeline, and every pitfall 
 
 - **No viscous CFD.** Aerodynamics is BEM + thin-airfoil + panel-level methods. No drag
   prediction, no separation, no stall onset.
-- **No 3D electromagnetics.** A full-stack 2D GetDP model now exists, but the radial return
-  path still needs 3D; the AFPM case is reported as *not verifiable* rather than passing.
+- **3D electromagnetics exists, but the winding is simplified.** Full-stack 2D, B-H secant,
+  3D slab and 3D annular sector are implemented; the coil is still treated as a full-pitch
+  coil (the actual 9-slot/10-pole concentrated winding is not resolved), and the AFPM case is
+  reported as *not verifiable* because the paper lacks magnet/PCB/winding data.
 - **2D heat transfer ignores what 2D ignores.** Solved by adding an axial-conduction fin
   reference — the remaining 0.168 % is mostly a post-processing convention (segment
   average vs midpoint); the genuine 1-D-vs-2-D axial-conduction effect is ≈1.1–1.5 %.
@@ -257,7 +259,8 @@ regenerated accordingly:
 - **AFPM**: new `scripts/afpm_getdp.py` implements the full-stack 2D magnetostatics (GetDP A_z,
   material-conforming mesh, both rotors, layer-averaged coil flux).  It shows that the old
   half-cell model forced the through-PCB flux: for the real 6 mm PCB the inter-pole leakage
-  dominates and `Kt` at 216 turns drops from 14.95 to **3.07 mNm/A**; the AFPM case is
+  dominates and `Kt` at 216 turns drops from 14.95 to **3.07 mNm/A** (2D) and **2.60**
+  (3D annular sector); the AFPM case is
   reclassified as **not verifiable** (paper lacks magnet thickness / PCB stack / winding).
 - **AFPM 3D/B-H**: `scripts/afpm_getdp3d.py` (one pole pair, unrolled slab, scalar potential,
   air margins) gives `Kt` 2.84 mNm/A at 216 turns, 10 % below the 2D multi-slice (radial end

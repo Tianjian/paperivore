@@ -61,6 +61,15 @@ GETDP=~/.cache/paperivore/getdp/root/usr/bin/getdp-sparskit \
 On Windows, install GetDP from <https://getdp.info> (or ONELAB) and pass `--getdp <path>`.
 `getdp --version` should print 3.x.
 
+With `GETDP` set, the three AFPM models can be regenerated:
+
+```bash
+GETDP=... python scripts/afpm_getdp.py --job results/afpm-pcb-motor/getdp2d
+GETDP=... python scripts/afpm_getdp.py --job results/afpm-pcb-motor/getdp2d-bh --bh
+GETDP=... python scripts/afpm_getdp3d.py --job results/afpm-pcb-motor/getdp3d
+GETDP=... python scripts/afpm_getdp3d_sector.py --job results/afpm-pcb-motor/getdp3d-sector
+```
+
 ## 3. FreeCAD (optional — human review only)
 
 The pipeline never needs FreeCAD; it is used to open a `STEP`, browse the model, and export

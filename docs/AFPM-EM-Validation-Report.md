@@ -11,12 +11,12 @@
 |---|---|---|---|---|
 | 极槽/尺寸 | 5 对极、9 槽、OD 19 mm、ID 7 mm、气隙 0.25 mm、PCB 6 mm | 完全复现 | — | ✅ |
 | 气隙磁密 $B_g$ | 论文未给 | 双转子 1-D 磁路 **0.3093 T**；旧半模型 2D **0.3766 T**；**GetDP 全叠层 2D：气隙 0.430 T，但线圈平面层平均仅 0.077 T** | — | ⚠️ 见 §4.1 |
-| 转矩常数 $K_t$ | **32.0 mNm/A**（实测） | 216 匝：1-D 磁路 12.28；旧半模型 14.95；**GetDP 全叠层 2D 3.07/3.15（5 切片）；B-H 3.08；3D slab 2.84；3D 环形扇区 2.60** | **−90 %**（3D/GetDP 基准） | ❌ 未复现（not verifiable） |
-| 反推有效匝数 | — | 要得到 32 mNm/A 需 **≈2200（GetDP）/ 563（1-D 磁路）/ 462（旧半模型）** | 表 I 推出（推断）216 | 论文缺项 |
+| 转矩常数 $K_t$ | **32.0 mNm/A**（实测） | 216 匝：1-D 磁路 12.28；旧半模型 14.95；**GetDP 全叠层 2D 3.07/3.15（5 切片）；B-H 3.08；3D slab 2.84；3D 环形扇区 2.60** | **−92 %**（3D 环形扇区基准） | ❌ 未复现（not verifiable） |
+| 反推有效匝数 | — | 要得到 32 mNm/A 需 **≈2200–2700（2D/3D）/ 563（1-D 磁路）/ 462（旧半模型）** | 表 I 推出（推断）216 | 论文缺项 |
 | 相电阻 $R$ | **4.70 Ω**（实测） | 按 0.36 mm × 0.06 mm 铜箔几何 = **2.84 Ω** | −40 % | ⚠️ 端接/过孔未计 |
 | 堵转转矩 | 158 mNm @ 5.95 A ⇒ 26.6 mNm/A | — | 低于 32（饱和） | ✅ 物理合理 |
 
-**一句话：几何复现，但用 GetDP 做的**全叠层 2D 复核**推翻了旧半模型的磁通口径——旧模型在中面强加对称条件，把穿越 PCB 的磁通人为固定，得到 0.3766 T / $K_t=14.95$；全叠层模型显示同样几何下气隙虽有 0.43 T，但 6 mm PCB 内极间漏磁严重，**层平均线圈磁通仅 0.077 T**，216 匝只给出 **3.07 mNm/A**（5 切片 3.15），与实测 32 mNm/A 差约 90 %。要闭合需要 **≈2200 匝**，或与论文所述（6 mm PCB、10 极、R=6.5 mm）不同的几何/拓扑。论文缺磁钢厚度、Br、PCB 叠层/相数、绕组串并联定义，因此该案应记为 **not verifiable**（无法判定是论文错还是数据不足），而不是简单的一个 "−53 %"。**
+**一句话：几何复现，但用 GetDP 做的**全叠层 2D 复核**推翻了旧半模型的磁通口径——旧模型在中面强加对称条件，把穿越 PCB 的磁通人为固定，得到 0.3766 T / $K_t=14.95$；全叠层模型显示同样几何下气隙虽有 0.43 T，但 6 mm PCB 内极间漏磁严重，**层平均线圈磁通仅 0.077 T**，216 匝只给出 **3.07 mNm/A**（5 切片 3.15；3D slab 2.84；3D 环形扇区 2.60），与实测 32 mNm/A 差约 **90–92 %**。要闭合需要 **≈2200–2700 匝**，或与论文所述（6 mm PCB、10 极、R=6.5 mm）不同的几何/拓扑。论文缺磁钢厚度、Br、PCB 叠层/相数、绕组串并联定义，因此该案应记为 **not verifiable**（无法判定是论文错还是数据不足），而不是简单的一个 "−53 %"。**
 
 ---
 
@@ -66,7 +66,14 @@
 
 ---
 
-## 2. 工具链新增能力：自研 2D 磁静场求解器
+## 2. 工具链新增能力：2D/3D 磁静场（GetDP）
+
+本轮新增的**定量**工具是 GetDP 路线（§4.1b）：`scripts/afpm_getdp.py`（全叠层 2D +
+B-H 割线）、`afpm_getdp3d.py`（3D 一极对展开 slab）、`afpm_getdp3d_sector.py`（3D 环形
+扇区）；GetDP 3.2.0 + Gmsh，材料界面共形网格。§2.1 的 numpy 半模型是历史基线，其场值
+已被 §4.1b 取代。
+
+### 2.1 历史基线：自研半模型（已被 §4.1b 取代）
 
 原工具链（build123d / gmsh / CalculiX / PyVista）**没有电磁求解器**。本轮新增：
 
@@ -102,7 +109,7 @@ $N_{ph}=48\times3\times3/2=216$（推断，见 §1.1）⇒ $K_t=12.28$ mNm/A（�
 
 ## 4. 验证结果与发现的问题
 
-### 4.1 磁路 vs 2D FEA（自洽性）
+### 4.1 磁路 vs 旧半模型 2D（自洽性；历史）
 
 | 模型 | $B_g$ | 说明 |
 |---|---|---|
@@ -144,7 +151,7 @@ $$\nu\,\nabla A_z \cdot \nabla w + h_c \cdot \nabla w = 0,\qquad h_c=-B_r/(\mu_0
 **结论**：轴向磁通在 6 mm PCB 内从表面 0.38 T 衰减到中面 0.065 T；6 mm PCB 厚度与
 $2\pi R/10=4.08$ mm 的极距相比太大，**同转子相邻极经 PCB 的极间漏磁占主导**（层平均线圈
 磁通仅为 1-D 磁路的约 22 %）。旧半模型 0.3766 T 的"2D 磁密"不是线圈磁通，而是被中面对称
-条件抬高的结果；旧 $K_t=14.95$ 因此高估约 5 倍。代码/数据：`scripts/afpm_getdp.py`、
+条件抬高的结果；旧 $K_t=14.95$ 因此高估约 **5–6 倍**（14.95 vs 2.60–3.07）。代码/数据：`scripts/afpm_getdp.py`、
 `results/afpm-pcb-motor/getdp2d/{result,multislice}.json`。
 
 **B-H 检查（一步割线）**：线性解给出的背铁平均 $|B|\approx0.57$ T；FeSi 曲线在该点
@@ -176,19 +183,21 @@ $1.60\times10^{-6}$ Wb）。它比 2D 5 切片 3.15 低 **17 %**、比 3D slab 2
 | 实测 | 32.0 mNm/A |
 | 表 I 匝数 216 + 双转子 1-D 磁路（0.3093 T） | 12.28 mNm/A |
 | 216 匝 + 旧半模型 2D（0.3766 T） | 14.95 mNm/A（**已被 §4.1b 取代**） |
-| **216 匝 + GetDP 全叠层 2D（层平均）** | **3.07 mNm/A（均值半径）/ 3.15（5 切片）** |
+| **216 匝 + GetDP 全叠层 2D（层平均）** | **3.07 mNm/A（均值半径）/ 3.15（5 切片）/ 3.08（B-H）** |
+| **216 匝 + GetDP 3D 一极对 slab** | **2.84 mNm/A** |
+| **216 匝 + GetDP 3D 环形扇区** | **2.60 mNm/A** |
 | 反推所需匝数（1-D 磁路 / 旧半模型） | **562.9 / 462.3** |
-| **反推所需匝数（GetDP 全叠层）** | **≈2200** |
+| **反推所需匝数（GetDP 2D / 3D slab / 3D 扇区）** | **≈2200 / 2400 / 2700** |
 
-差距约 **10 倍**（**−90 %**）。可能的解释（论文未给数据，无法判定）：
-1. 每相串联匝数不是 216——216 本身是推断值（见 §1.1）；按 GetDP 全叠层场要 32 mNm/A 需约 **2200 匝**；
+差距约 **12.3 倍**（**−92 %**，3D 环形扇区）。可能的解释（论文未给数据，无法判定）：
+1. 每相串联匝数不是 216——216 本身是推断值（见 §1.1）；按 GetDP 场要 32 mNm/A 需约 **2200–2700 匝**；
 2. PCB 实际有效厚度/叠层与"6 mm 单块"不同（例如多块 PCB 串联、有效磁路厚度更薄）——论文的 "48 layers / 3 PCBs in series" 本身两义；
 3. 磁钢更厚/$B_r$ 更高、极弧/拓扑不同——论文未给磁钢厚度与牌号；
-4. 上述 2D 全叠层模型仍是**单切片 + 线性铁**，需要 3D/多切片 + B-H 才能最终裁决。
+4. 上述 3D 环形扇区仍用**线性铁 + 全距线圈**假设；B-H 已核背铁未饱和（§4.1b），但实际 9 槽/10 极绕组函数与参数反演仍是下一步。
 
 **判定：❌ 未复现，且列为 not verifiable**——论文参数集在标准 TORUS 解释下无法闭合实测 $K_t$
-（GetDP 全叠层差约 90 %，1-D 磁路差 62 %）；但差距已大到不能归因于单一"匝数"缺项，必须
-补论文缺失的磁钢/PCB/绕组数据并用 3D 模型才能判定是论文数据问题还是模型解释问题。
+（GetDP 2D/3D 差 90–92 %，1-D 磁路差 62 %）；但差距已大到不能归因于单一"匝数"缺项，必须
+补论文缺失的磁钢/PCB/绕组数据并用绕组函数/参数反演才能判定是论文数据问题还是模型解释问题。
 **不再使用旧半模型的 −53 % 作为结论**；旧值只作为"半模型中面对称假设导致的偏差"保留。
 
 ### 4.3 相电阻对标
@@ -227,6 +236,10 @@ $158\ \text{mNm}/5.95\ \text{A}=26.6$ mNm/A，低于小电流下的 32 mNm/A—�
 | `viz/field_2d.png` | 2D 磁静场 $|B|$ 云图 + 气隙 $B_y$ 沿极距波形 |
 | `viz/kt_study.png` | $B_g(h_m)$ 曲线 + $K_t(N_{ph},h_m)$ 等值线，红线为实测 32 mNm/A |
 
+> 上述 `viz/*` 图来自旧半模型/参数研究，仅作**定性示意**；当前定量场数据在
+> `results/afpm-pcb-motor/{getdp2d,getdp2d-bh,getdp3d,getdp3d-sector}/result.json`，
+> 生成脚本为 `scripts/afpm_getdp*.py`。
+
 ---
 
 ## 6. 局限与下一步
@@ -235,7 +248,7 @@ $158\ \text{mNm}/5.95\ \text{A}=26.6$ mNm/A，低于小电流下的 32 mNm/A—�
 |---|---|---|
 | 3D 电磁场 | ✅ 2D + 3D slab + 3D 环形扇区 | 2D 全叠层 + B-H 割线 + 3D slab + **3D 环形扇区**（§4.1b）；环形扇区 Kt 2.60，反推 ≈2700 匝 |
 | 磁钢厚度 / Br | ❌ 论文未给 | 已用显式假设，$K_t$ 因此无法闭合 |
-| 绕组拓扑 | ❌ 论文未给 | 216 vs 462–563 匝，需原理图或层叠图 |
+| 绕组拓扑 | ❌ 论文未给 | 216 vs 2200–2700（GetDP）/ 462–563（旧），需原理图或层叠图 |
 | 铁损 / 铜损 | ❌ 未算 | 需要 $B(t)$ 时域波形与材料损耗曲线 |
 | 退磁校核 | ❌ 未算 | 需要磁钢内禀曲线与最恶劣工况 |
 | 转矩脉动 / 齿槽 | ❌ 未算 | 需要转子位置扫描（3D 或 2D 多切片） |
@@ -244,11 +257,20 @@ $158\ \text{mNm}/5.95\ \text{A}=26.6$ mNm/A，低于小电流下的 32 mNm/A—�
 
 ## 7. 复现命令
 
-```powershell
-$py = ".venv\Scripts\python.exe"
-& $py scripts\afpm_model.py geom  --job results\afpm-pcb-motor
-& $py scripts\afpm_model.py field --job results\afpm-pcb-motor
-& $py scripts\afpm_viz.py        --job results\afpm-pcb-motor
+```bash
+# 1) 旧半模型 + 1-D 磁路（历史基线，场值已被 §4.1b 取代）
+python scripts/afpm_model.py geom  --job results/afpm-pcb-motor
+python scripts/afpm_model.py field --job results/afpm-pcb-motor
+python scripts/afpm_viz.py         --job results/afpm-pcb-motor
+
+# 2) GetDP：全叠层 2D / B-H / 3D slab / 3D 环形扇区（当前定量结果）
+#    先 ./scripts/getdp_bootstrap.sh 或设 GETDP=<path>/getdp-sparskit
+GETDP=... python scripts/afpm_getdp.py --job results/afpm-pcb-motor/getdp2d --multi-slice 5
+GETDP=... python scripts/afpm_getdp.py --job results/afpm-pcb-motor/getdp2d-bh --bh
+GETDP=... python scripts/afpm_getdp3d.py --job results/afpm-pcb-motor/getdp3d
+GETDP=... python scripts/afpm_getdp3d_sector.py --job results/afpm-pcb-motor/getdp3d-sector
 ```
 
-产物：`afpm/afpm.step`、`afpm/field.npz`、`afpm/result.json`、`viz/*.png`。
+产物：旧 `afpm/afpm.step`、`afpm/field.npz`、`afpm/result.json`、`viz/*.png`；当前
+`getdp2d/{result,multislice}.json`、`getdp2d-bh/result.json`、`getdp3d/result.json`、
+`getdp3d-sector/result.json`。
