@@ -171,7 +171,7 @@ skill/       the agent-facing SOP (how to drive the pipeline, and every pitfall 
 | `docs/` | [toolchain report](docs/CAD-CAE-Windows-Toolchain-Report.md) · [airfoil #1](docs/Airfoil-Validation-Report.md) · [airfoil #2](docs/Airfoil-Validation-2-Report.md) · [wind blade](docs/Wind-Blade-Validation-Report.md) · [thermal](docs/Thermal-Pipe-Validation-Report.md) · [motor](docs/AFPM-EM-Validation-Report.md) |
 | `papers/` | [provenance & licences](papers/README.md) |
 | `results/` | [result index](results/README.md) |
-| `tests/` | `pytest -q` — 25 golden-value checks, also run by [CI](.github/workflows/ci.yml) |
+| `tests/` | `pytest -q` — 28 golden-value checks, also run by [CI](.github/workflows/ci.yml) |
 | `skill/` | [SKILL.md](skill/cad-cae/SKILL.md) — the operational checklist |
 
 ---
@@ -212,7 +212,8 @@ skill/       the agent-facing SOP (how to drive the pipeline, and every pitfall 
   single-stator axial-flux machine (the return path is radial); that case is deliberately
   reported as a known-inadequate model rather than a passing one.
 - **2D heat transfer ignores what 2D ignores.** Solved by adding an axial-conduction fin
-  reference — the residual 0.17 % is the 3D effect.
+  reference — the remaining 0.168 % is mostly a post-processing convention (segment
+  average vs midpoint); the genuine 1-D-vs-2-D axial-conduction effect is ≈1.1–1.5 %.
 - **No radiation, no conjugate heat transfer, no contact, no composites layup.**
 - **Windows-first.** Scripts use PowerShell; the Python side is portable.
 
