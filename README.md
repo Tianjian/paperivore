@@ -74,7 +74,7 @@ kept in this repository as the receipts.
 | 3 | NACA 2412 / 4412 polars (J. Thermal Eng. 2024) | 10 lift points, lift-curve slope, stall trend | ✅ pass | pre-stall **4.5 – 23 %**; slope **+0.3 %** as a 0–10° fit (5–10° alone: −24 %); stall divergence expected |
 | 4 | 25 m HAWT blade (RERA 2026) | Glauert design, BEM `Cp–TSR`, power curve, solid FEA | ✅ pass / ⚠️ | `Cp` **−11 %** (design-law φ ≈3–6 pp + quadrature); 9 m/s power **−8.9 %**; 14 m/s power **−21.5 %** (post-stall polar; −0.5 % with Viterna) |
 | 5 | Exhaust pipe (Thermal Science 2010) | steady conduction + two-sided convection (`*FILM`) | ✅ pass | **0.001 %** vs exact 1D (conformance test); **0.168 %** vs fin solution (≈96 % post-processing convention) |
-| 6 | PCB axial-flux motor (arXiv 2509.23561) | full-stack 2D + B-H + 3D slab magnetostatics (GetDP) + dual-rotor circuit | ❌ not verifiable | 216-turn field gives `Kt` **≈3.1 mNm/A** (2D) / **2.84** (3D slab) vs measured 32 (−90 %); `R` −40 %; needs ≈2 200–2 400 turns or a different geometry — paper lacks magnet thickness / PCB stack / winding definition |
+| 6 | PCB axial-flux motor (arXiv 2509.23561) | full-stack 2D + B-H + 3D slab + **3D annular sector** (GetDP) + dual-rotor circuit | ❌ not verifiable | 216-turn field gives `Kt` **≈3.1** (2D) / **2.84** (3D slab) / **2.60** (3D sector) vs measured 32 (−92 %); `R` −40 %; needs ≈2 200–2 700 turns or a different geometry — paper lacks magnet thickness / PCB stack / winding definition |
 
 **Rejected prey** (screened out, kept in `papers/` for transparency): `exhaust_manifold.pdf`
 does contain a steady-state thermal study, but the temperature field is shown only as
@@ -146,7 +146,7 @@ Python — no CalculiX, no gmsh, no CAD kernel:
 
 ```powershell
 pip install numpy scipy pytest
-pytest -q          # 33 tests, < 2 s
+pytest -q          # 35 tests, < 2 s
 ```
 
 These tests pin the golden values the reports quote. If a refactor moves a baseline, CI
@@ -171,7 +171,7 @@ skill/       the agent-facing SOP (how to drive the pipeline, and every pitfall 
 | `docs/` | [toolchain report](docs/CAD-CAE-Windows-Toolchain-Report.md) · [airfoil #1](docs/Airfoil-Validation-Report.md) · [airfoil #2](docs/Airfoil-Validation-2-Report.md) · [wind blade](docs/Wind-Blade-Validation-Report.md) · [thermal](docs/Thermal-Pipe-Validation-Report.md) · [motor](docs/AFPM-EM-Validation-Report.md) |
 | `papers/` | [provenance & licences](papers/README.md) |
 | `results/` | [result index](results/README.md) |
-| `tests/` | `pytest -q` — 33 golden-value checks, also run by [CI](.github/workflows/ci.yml) |
+| `tests/` | `pytest -q` — 35 golden-value checks, also run by [CI](.github/workflows/ci.yml) |
 | `skill/` | [SKILL.md](skill/cad-cae/SKILL.md) — the operational checklist |
 
 ---
@@ -263,7 +263,11 @@ regenerated accordingly:
   air margins) gives `Kt` 2.84 mNm/A at 216 turns, 10 % below the 2D multi-slice (radial end
   leakage); a one-step B-H secant shows the back iron at 0.57 T (μr ≈ 5 000), i.e. not
   saturated, and changes `Kt` by <0.1 %.
-- Regression tests: 25 → 33 (airfoil S2, AFPM circuit/turns, BEM, GetDP post-processing, B-H/3D helpers).
+- **AFPM annular sector**: `scripts/afpm_getdp3d_sector.py` builds a true 36° annular
+  sector (OCC cylinders + fragment, scalar phi, radial air margins); Kt = 2.60 mNm/A at
+  216 turns, 17 % below the 2D 5-slice (3.15) and 8 % below the 3D slab (2.84) — the inner
+  radius' small pole pitch and the radius-dependent magnet width increase the leakage.
+- Regression tests: 25 → 35 (airfoil S2, AFPM circuit/turns, BEM, GetDP post-processing, B-H/3D/sector helpers).
 
 ## Licence
 

@@ -62,3 +62,9 @@ def test_3d_pole_pitch_matches_2d():
     _, p3 = ag3.pole_pitch()
     _, p2 = ag.pole_geometry()
     assert p3 == pytest.approx(p2, rel=1e-12)
+
+
+def test_sector_pole_angles():
+    import afpm_getdp3d_sector as sec
+    assert sec.POLE_DEG == pytest.approx(36.0)
+    assert sec.HALF_DEG == pytest.approx(18.0)
