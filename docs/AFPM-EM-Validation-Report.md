@@ -142,9 +142,9 @@ $$\nu\,\nabla A_z \cdot \nabla w + h_c \cdot \nabla w = 0,\qquad h_c=-B_r/(\mu_0
 
 | 量 | 值 |
 |---|---|
-| 气隙 $\overline{|B_y|}$ | **0.430 T** |
-| PCB 中面 $\overline{|B_y|}$ | **0.065 T** |
-| PCB 近磁钢面（$y=3.0$ mm） $\overline{|B_y|}$ | **0.376 T** |
+| 气隙 $\overline{\vert B_y\vert}$ | **0.430 T** |
+| PCB 中面 $\overline{\vert B_y\vert}$ | **0.065 T** |
+| PCB 近磁钢面（$y=3.0$ mm） $\overline{\vert B_y\vert}$ | **0.376 T** |
 | 层平均每极磁通（$z=0\to 3$ mm 平均） | **$1.90\times10^{-6}$ Wb**（$\hat B_\mathrm{pole}=0.077$ T） |
 | $K_t$ @ 216 匝（均值半径 / 5 切片） | **3.07 / 3.15 mNm/A** |
 
@@ -233,7 +233,7 @@ $158\ \text{mNm}/5.95\ \text{A}=26.6$ mNm/A，低于小电流下的 32 mNm/A—�
 | 图 | 内容 |
 |---|---|
 | `viz/section_2d.png` | r-z 层叠剖面：PCB 6 mm、气隙 0.25 mm、磁钢 1 mm、背铁 |
-| `viz/field_2d.png` | 2D 磁静场 $|B|$ 云图 + 气隙 $B_y$ 沿极距波形 |
+| `viz/field_2d.png` | 2D 磁静场 $\vert B\vert$ 云图 + 气隙 $B_y$ 沿极距波形 |
 | `viz/kt_study.png` | $B_g(h_m)$ 曲线 + $K_t(N_{ph},h_m)$ 等值线，红线为实测 32 mNm/A |
 
 > 上述 `viz/*` 图来自旧半模型/参数研究，仅作**定性示意**；当前定量场数据在
