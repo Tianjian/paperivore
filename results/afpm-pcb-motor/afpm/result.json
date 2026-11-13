@@ -15,10 +15,14 @@
     "h_m_assumed": 0.001,
     "step": "runs\\afpm-01\\afpm\\afpm.step"
   },
-  "Bg_fem_T": 0.379,
-  "Bg_circuit_T": 0.1793,
-  "flux_per_pole_Wb": 9.29e-06,
-  "Kt_at_N216_mNm_A": 15.045,
-  "N_implied_from_meas": 459.4,
+  "topology_note": "dual-rotor TORUS 1-D circuit: 2 magnets in series, 2 gaps, 1 PCB",
+  "Bg_fem_T": 0.3766,
+  "Bg_circuit_T": 0.3093,
+  "flux_per_pole_fem_Wb": 9.2284e-06,
+  "flux_per_pole_circuit_Wb": 7.5792e-06,
+  "Kt_at_N216_fem_mNm_A": 14.95,
+  "Kt_at_N216_circuit_mNm_A": 12.278,
+  "N_implied_from_meas_fem": 462.3,
+  "N_implied_from_meas_circuit": 562.9,
   "N_from_table": 216.0
 }

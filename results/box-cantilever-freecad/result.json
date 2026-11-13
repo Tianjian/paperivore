@@ -9,7 +9,7 @@
   ],
   "max_disp_mm": 0.0706887223619424,
   "max_vm_stress_MPa": 44.483571949434776,
-  "max_vm_stress_note": "element peak from raw FRD (un-averaged)",
+  "max_vm_stress_note": "nodal extrapolated peak from raw FRD (values averaged over elements at nodes)",
   "image": "runs\\job-0005\\stress.png",
   "image_side": "runs\\job-0005\\stress_side.png",
   "sta_tail": [

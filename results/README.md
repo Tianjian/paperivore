@@ -6,27 +6,27 @@ plots shown in the reports (`png`), and the CAD output (`step`). Meshes, solver 
 
 | Folder | Case | Key file | Look at |
 |---|---|---|---|
-| `box-cantilever-500N/` | STEP → gmsh → CalculiX smoke test, 500 N tip load | `result.json` (0.0708 mm, 51.6 MPa) | `stress.png` |
+| `box-cantilever-500N/` | STEP → gmsh → CalculiX smoke test, 500 N tip load | `result.json` (0.0708 mm; 51.6 MPa nodal peak, 40.4 MPa element-average) | `stress.png` |
 | `box-cantilever-800N/` | Same mesh, 800 N — checks linearity | `result.json` (0.1133 mm, 82.6 MPa) | `stress.png` |
 | `box-cantilever-freecad/` | Same part driven through FreeCAD + drawing export | `result.json` (0.0707 mm) | `freecad/drawing.pdf` |
-| `uav-wing-naca4412/` | Round 1: NACA 4412 profile, closed STEP, box-spar wing FEA | `wing/result.json` (tip +6.7 %) | `airfoil/airfoil_shape.png`, `wing/*` |
+| `uav-wing-naca4412/` | Round 1: NACA 4412 profile, closed STEP, box-spar wing FEA | `wing/result.json` (tip +6.7 %; section S33 ≤3.1 %) | `airfoil/airfoil_shape.png`, `wing/*` |
 | `uav-wing-polar/` | Round 2: NACA 2412 + 4412 polars vs paper | `polar/polar.json` (10 CL points) | `polar/polar_compare.png` |
 | `wind-blade-25m/` | Round 3: 25 m blade, Glauert chord/twist, BEM, solid FEA | `bem/bem.json`, `fea/result.json` | `viz/cp_tsr.png`, `viz/blade_3d_rotor.png` |
 | `exhaust-pipe-gradient/` | Round 4: pipe with axial gas gradient (500 → 350 °C) | `thermal/result.json` (0.168 % vs fin) | `viz/thermal_3d.png`, `viz/thermal_2d.png` |
 | `exhaust-pipe-uniform/` | Round 4: uniform gas temperature, exact-solution check | `thermal/result.json` (0.001 %) | `viz/thermal_2d.png` |
-| `afpm-pcb-motor/` | Round 5: PCB axial-flux motor, magnetic circuit + 2D field | `afpm/result.json` (`Kt` −53 %) | `viz/afpm_3d.png`, `viz/field_2d.png`, `viz/kt_study.png` |
+| `afpm-pcb-motor/` | Round 5: PCB axial-flux motor, corrected dual-rotor circuit + 2D field | `afpm/result.json` (`Kt` −53 % FEA / −62 % circuit) | `viz/afpm_3d.png`, `viz/field_2d.png`, `viz/kt_study.png` |
 
 ## Reading a result file
 
-Every `result.json` follows the same shape:
+The schema depends on the case; each report documents its own keys:
 
-```jsonc
-{
-  "fea":      { ... },   // what the solver produced
-  "theory":   { ... },   // the independent reference (beam, fin, BEM, circuit)
-  "error":    { ... }    // relative errors, already computed
-}
-```
+| Case | `result.json` shape |
+|---|---|
+| `box-cantilever-*/` | `{vtk, n_points, n_cells, arrays, max_disp_mm, max_vm_stress_MPa, max_vm_stress_note, max_vm_stress_element_avg_MPa, sta_tail, errors}` — `max_vm_stress_MPa` is the **nodal extrapolated peak** from the FRD (not a converged element value); `max_vm_stress_element_avg_MPa` is the element-averaged peak. |
+| `uav-wing-*/wing/` | `{fea, beam_theory, deflection_profile, sections, error, note}` — `sections` compares element-averaged S33 with beam theory. |
+| `exhaust-pipe-*/thermal/` | `{segments: [...], max_err_inner_pct, max_err_outer_pct, max_err_fin_pct}`. |
+| `afpm-pcb-motor/afpm/` | `{paper, geometry, topology_note, Bg_fem_T, Bg_circuit_T, flux_per_pole_fem_Wb, flux_per_pole_circuit_Wb, Kt_at_N216_*_mNm_A, N_implied_from_meas_*, N_from_table}`. |
+| `wind-blade-25m/` | `blade/design.json` (rows), `bem/bem.json` (cp_sweep, power_curve, check), `fea/{mesh,result}.json`. |
 
-If a field is `null` or missing, the case did not produce it — that is usually the point
-being made in the corresponding report.
+A field that is `null` or missing means the case did not produce it — that is usually the
+point being made in the corresponding report.

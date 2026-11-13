@@ -1,6 +1,7 @@
 {
   "paper": {
-    "title": "Performance analysis of NACA 2412 and NACA 4412 airfoils (CFD)",
+    "title": "Characterization of NACA 2412 and NACA 4412 airfoils: Effects of angle of attack on aerodynamics coefficients",
+    "authors": "D. Akgumus Gok, K. N. M. Al-Nimer",
     "journal": "Journal of Thermal Engineering 10(6): 1524-1538, 2024",
     "doi": "10.14744/thermal.0000892",
     "license": "CC BY-NC",
@@ -73,7 +74,7 @@
   },
   "aerodynamics": {
     "NACA 2412": {
-      "alpha_L0_deg": -2.077202207721882,
+      "alpha_L0_deg": -2.0772022077218817,
       "slope_per_rad": 6.283185307179586,
       "rows": [
         {
@@ -114,7 +115,7 @@
       ]
     },
     "NACA 4412": {
-      "alpha_L0_deg": -4.154404415443764,
+      "alpha_L0_deg": -4.154404415443763,
       "slope_per_rad": 6.283185307179586,
       "rows": [
         {

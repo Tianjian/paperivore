@@ -1,5 +1,6 @@
 {
-  "Bg_fem_T": 0.379,
-  "Bg_circuit_T": 0.1793,
-  "flux_per_pole_Wb": 4.393896483779379e-06
+  "Bg_fem_T": 0.3766,
+  "Bg_circuit_T": 0.3093,
+  "flux_per_pole_fem_Wb": 9.2296e-06,
+  "flux_per_pole_circuit_Wb": 7.5804e-06
 }

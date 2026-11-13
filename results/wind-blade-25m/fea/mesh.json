@@ -1,6 +1,6 @@
 {
-  "nodes": 5193,
-  "elements": 1,
+  "nodes": 5195,
+  "elements": 15944,
   "element_type": "C3D4",
   "mesh_size_m": 0.9,
   "root_nodes": 1018,

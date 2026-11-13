@@ -1,9 +1,11 @@
 {
   "fea": {
     "tip_deflection_mm": 1.8657,
-    "max_s11_MPa": 4.0265,
-    "max_s33_MPa": 12.9495,
+    "max_s11_MPa": 4.0264,
+    "max_s33_MPa": 12.9494,
     "max_vm_stress_MPa": 11.1667,
+    "max_s33_element_avg_MPa": 11.5199,
+    "max_vm_stress_element_avg_MPa": 9.9323,
     "tip_nodes": 988,
     "n_disp": 120025,
     "n_stress": 120025
@@ -68,29 +70,29 @@
   "sections": [
     {
       "z_mm": 100.0,
-      "fea_max_s33_MPa": 6.25,
+      "fea_max_s33_MPa": 5.663,
       "beam_sigma_MPa": 5.626,
-      "rel_err": 0.111,
-      "n_elements": 201
+      "rel_err": 0.0066,
+      "n_elements": 1752
     },
     {
       "z_mm": 200.0,
-      "fea_max_s33_MPa": 7.724,
+      "fea_max_s33_MPa": 4.543,
       "beam_sigma_MPa": 4.65,
-      "rel_err": 0.6613,
-      "n_elements": 351
+      "rel_err": 0.0229,
+      "n_elements": 1758
     },
     {
       "z_mm": 400.0,
-      "fea_max_s33_MPa": 9.761,
+      "fea_max_s33_MPa": 2.954,
       "beam_sigma_MPa": 2.976,
-      "rel_err": 2.2801,
-      "n_elements": 756
+      "rel_err": 0.0074,
+      "n_elements": 1760
     }
   ],
   "error": {
     "deflection_rel_err": 0.0836,
-    "root_peak_s33_rel_err": 0.9341
+    "section_s33_max_rel_err": 0.0229
   },
-  "note": "deflection profile is the primary check; the S33 peak is mesh/boundary sensitive in the 3 mm walls"
+  "note": "deflection profile is the primary check; the nodal S33 peak is a small-area extrapolation artefact, while the section table uses element-averaged nodal stresses (node/element id spaces are no longer mixed)"
 }

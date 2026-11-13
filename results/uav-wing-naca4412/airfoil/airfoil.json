@@ -45,54 +45,54 @@
     {
       "x_over_c": 0.1,
       "upper_ref": 0.0638,
-      "upper_calc": 0.0,
+      "upper_calc": 0.06381,
       "lower_ref": -0.0288,
-      "lower_calc": -0.0286,
-      "max_abs_err": 0.0638
+      "lower_calc": -0.02881,
+      "max_abs_err": 1e-05
     },
     {
       "x_over_c": 0.3,
       "upper_ref": 0.0974,
-      "upper_calc": 0.0,
+      "upper_calc": 0.097442,
       "lower_ref": -0.0224,
-      "lower_calc": -0.0226,
-      "max_abs_err": 0.0974
+      "lower_calc": -0.022442,
+      "max_abs_err": 4.2e-05
     },
     {
       "x_over_c": 0.5,
       "upper_ref": 0.0918,
-      "upper_calc": 0.0,
+      "upper_calc": 0.091816,
       "lower_ref": -0.014,
-      "lower_calc": -0.014,
-      "max_abs_err": 0.0918
+      "lower_calc": -0.014038,
+      "max_abs_err": 3.8e-05
     },
     {
       "x_over_c": 0.7,
       "upper_ref": 0.0666,
-      "upper_calc": 0.0,
+      "upper_calc": 0.066558,
       "lower_ref": -0.0066,
-      "lower_calc": -0.0065,
-      "max_abs_err": 0.0666
+      "lower_calc": -0.006558,
+      "max_abs_err": 4.2e-05
     },
     {
       "x_over_c": 0.9,
       "upper_ref": 0.0266,
-      "upper_calc": 0.0,
+      "upper_calc": 0.026611,
       "lower_ref": -0.0022,
-      "lower_calc": -0.0021,
-      "max_abs_err": 0.0266
+      "lower_calc": -0.002166,
+      "max_abs_err": 3.4e-05
     },
     {
       "x_over_c": 1.0,
       "upper_ref": 0.0012,
-      "upper_calc": 0.0,
+      "upper_calc": 0.001249,
       "lower_ref": -0.0012,
-      "lower_calc": -0.0012,
-      "max_abs_err": 0.0012
+      "lower_calc": -0.001249,
+      "max_abs_err": 4.9e-05
     }
   ],
   "S3_thin_airfoil": {
-    "alpha_L0_deg": -4.154404415443764,
+    "alpha_L0_deg": -4.154404415443763,
     "cl_slope_per_rad": 6.283185307179586,
     "alpha_deg_for_paper_Cl": 12.18,
     "cl_curve": [
@@ -123,6 +123,6 @@
     ]
   },
   "S4_files": {
-    "dat": "runs\\uav-wing-01\\airfoil\\naca4412.dat"
+    "dat": "/tmp/regen/airfoil/airfoil/naca4412.dat"
   }
 }
