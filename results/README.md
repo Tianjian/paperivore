@@ -25,6 +25,8 @@ The schema depends on the case; each report documents its own keys:
 | `box-cantilever-*/` | `{vtk, n_points, n_cells, arrays, max_disp_mm, max_vm_stress_MPa, max_vm_stress_note, max_vm_stress_element_avg_MPa, sta_tail, errors}` — `max_vm_stress_MPa` is the **nodal extrapolated peak** from the FRD (not a converged element value); `max_vm_stress_element_avg_MPa` is the element-averaged peak. |
 | `uav-wing-*/wing/` | `{fea, beam_theory, deflection_profile, sections, error, note}` — `sections` compares element-averaged S33 with beam theory. |
 | `exhaust-pipe-*/thermal/` | `{segments: [...], max_err_inner_pct, max_err_outer_pct, max_err_fin_pct}`. |
+| `afpm-pcb-motor/getdp3d/` | `{geometry, nph, flux_per_pole_Wb, Kt_mNm_A, slices[]}` (3D slab). |
+| `afpm-pcb-motor/getdp2d-bh/` | same as `getdp2d/` plus `bh:{iters, mur_iron, B_iron_mean_T}`. |
 | `afpm-pcb-motor/afpm/` | `{paper, geometry, topology_note, Bg_fem_T, Bg_circuit_T, flux_per_pole_fem_Wb, flux_per_pole_circuit_Wb, Kt_at_N216_*_mNm_A, N_implied_from_meas_*, N_from_table}`. |
 | `afpm-pcb-motor/getdp2d/` | `{geometry, B_mid, B_gap, B_near_surface, layers[], flux_per_m_layer_avg_Wb_per_m, flux_per_pole_Wb, Kt_mNm_A}` — plus `multislice.json`. |
 | `wind-blade-25m/` | `blade/design.json` (rows), `bem/bem.json` (cp_sweep, power_curve, check), `fea/{mesh,result}.json`. |

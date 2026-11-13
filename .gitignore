@@ -24,6 +24,7 @@ venv/
 
 # GetDP working files (mesh/pro/table output)
 _getdp/
+_getdp3d/
 
 # keep the solver smoke-test deck
 !scripts/smoke.inp

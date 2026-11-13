@@ -47,3 +47,18 @@ def test_layer_average_flux_and_kt():
     assert out["flux_per_m_layer_avg_Wb_per_m"] == pytest.approx(P, rel=1e-6)
     assert out["flux_per_pole_Wb"] == pytest.approx(P * Lr, rel=1e-6)
     assert out["Kt_mNm_A"] == pytest.approx(1.5 * ag.P_PAIRS * 216 * (P * Lr) * 1e3, rel=1e-6)
+
+
+def test_bh_secant_effective_mur():
+    from afpm_getdp import _mur_from_BH
+    # at 0.57 T the FeSi curve is far from saturation -> high mur (capped)
+    assert 2000 < _mur_from_BH(0.57, 1000) <= 5000
+    # at 1.8 T it must be much lower
+    assert _mur_from_BH(1.8, 1000) < 1500
+
+
+def test_3d_pole_pitch_matches_2d():
+    import afpm_getdp3d as ag3
+    _, p3 = ag3.pole_pitch()
+    _, p2 = ag.pole_geometry()
+    assert p3 == pytest.approx(p2, rel=1e-12)
