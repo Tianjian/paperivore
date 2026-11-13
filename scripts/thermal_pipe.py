@@ -81,16 +81,18 @@ def build_mesh(job: Path, h: float, nseg: int, t_in: float | None = None,
         T_GAS_IN = t_in
     if t_out is not None:
         T_GAS_OUT = t_out
-    from build123d import Cylinder, Pos, export_step
-    import gmsh
-
     th = job / "thermal"
     th.mkdir(parents=True, exist_ok=True)
     step = th / "pipe.step"
     if not step.exists():
+        # build123d 只在需要生成几何时导入：已有 pipe.step 的用户（例如没有
+        # CAD 内核的 Linux 环境）只需 gmsh，不必装 OCCT。
+        from build123d import Cylinder, Pos, export_step
+
         outer = Pos(0, 0, L / 2) * Cylinder(R_O, L, align=(None, None, None))
         inner = Pos(0, 0, L / 2) * Cylinder(R_I, L * 1.2, align=(None, None, None))
         export_step(outer - inner, str(step))
+    import gmsh
 
     gmsh.initialize(["gmsh", "-v", "2"])
     try:

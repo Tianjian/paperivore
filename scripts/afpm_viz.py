@@ -22,6 +22,7 @@ H_M = 0.0010
 KT_MEAS = 0.0320
 R_MEAS = 4.70
 BR = 1.30
+MU_R_MAG = 1.05
 MU0 = 4e-7 * math.pi
 
 
@@ -72,11 +73,12 @@ def main() -> int:
     # ---------- Kt study ----------
     A_pole = pole_area()
     h_m = np.linspace(0.0003, 0.004, 60)
-    g_eff = GAP + PCB_T / 2
-    Bg_circ = BR / (1 + g_eff / h_m)
+    # dual-rotor (TORUS) 1-D circuit: two magnets in series, two gaps, one PCB
+    g_eff = 2.0 * GAP + PCB_T
+    Bg_circ = 2.0 * BR * h_m / (2.0 * h_m / MU_R_MAG + g_eff)
     n_ph = np.linspace(50, 900, 60)
     N, H = np.meshgrid(n_ph, h_m)
-    Bg_grid = BR / (1 + g_eff / H)
+    Bg_grid = 2.0 * BR * H / (2.0 * H / MU_R_MAG + g_eff)
     Kt_grid = 1.5 * P_PAIRS * N * Bg_grid * A_pole
 
     fig, ax = plt.subplots(1, 2, figsize=(11.5, 4.2))
@@ -92,9 +94,11 @@ def main() -> int:
     ax[1].set_title("$K_t$ map; red line = measured 32 mNm/A")
     fig.tight_layout(); fig.savefig(viz / "kt_study.png", dpi=150); plt.close(fig)
 
-    # implied flux / turns from the measured Kt
+    # implied flux / turns from the measured Kt (FEA and 1-D circuit bases)
     Bg_fem = field["Bg_fem_T"]
+    Bg_circuit = field["Bg_circuit_T"]
     n_implied = KT_MEAS / (1.5 * P_PAIRS * Bg_fem * A_pole)
+    n_implied_circuit = KT_MEAS / (1.5 * P_PAIRS * Bg_circuit * A_pole)
     n_table = 216.0     # 48 layers x 3 turns x 3 coils/phase / 2 parallel (interpretation)
 
     # ---------- 2D cross-section (r-z) ----------
@@ -167,11 +171,15 @@ def main() -> int:
         "paper": {"doi": "arXiv:2509.23561", "Kt_meas_mNm_A": 32.0, "R_meas_ohm": 4.70,
                   "T_stall_mNm": 158, "I_stall_A": 5.95},
         "geometry": geom,
+        "topology_note": "dual-rotor TORUS 1-D circuit: 2 magnets in series, 2 gaps, 1 PCB",
         "Bg_fem_T": round(Bg_fem, 4),
-        "Bg_circuit_T": round(field["Bg_circuit_T"], 4),
-        "flux_per_pole_Wb": round(Bg_fem * A_pole, 8),
-        "Kt_at_N216_mNm_A": round(1.5 * P_PAIRS * n_table * Bg_fem * A_pole * 1e3, 3),
-        "N_implied_from_meas": round(n_implied, 1),
+        "Bg_circuit_T": round(Bg_circuit, 4),
+        "flux_per_pole_fem_Wb": round(Bg_fem * A_pole, 10),
+        "flux_per_pole_circuit_Wb": round(Bg_circuit * A_pole, 10),
+        "Kt_at_N216_fem_mNm_A": round(1.5 * P_PAIRS * n_table * Bg_fem * A_pole * 1e3, 3),
+        "Kt_at_N216_circuit_mNm_A": round(1.5 * P_PAIRS * n_table * Bg_circuit * A_pole * 1e3, 3),
+        "N_implied_from_meas_fem": round(n_implied, 1),
+        "N_implied_from_meas_circuit": round(n_implied_circuit, 1),
         "N_from_table": n_table,
     }
     (th / "result.json").write_text(json.dumps(result, indent=2, ensure_ascii=False), encoding="utf-8")

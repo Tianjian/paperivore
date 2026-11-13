@@ -1,0 +1,36 @@
+** smoke.inp - minimal CalculiX deck used to verify the solver install.
+** 1 mm steel cube, bottom face fixed, 1 N total compression on the top face.
+** Expected: uniform uniaxial state (eps_z = -4.76e-6), max |U| = 5.17e-6 mm,
+** 1 increment, no *ERROR.  The bottom face is fixed in z only; node 1 is also
+** fixed in x/y and node 2 in y to remove the rigid-body modes.
+** Windows: ccx_i8.exe -i smoke      Linux: ccx -i smoke
+*NODE, NSET=NALL
+1, 0., 0., 0.
+2, 1., 0., 0.
+3, 1., 1., 0.
+4, 0., 1., 0.
+5, 0., 0., 1.
+6, 1., 0., 1.
+7, 1., 1., 1.
+8, 0., 1., 1.
+*ELEMENT, TYPE=C3D8, ELSET=EALL
+1, 1, 2, 3, 4, 5, 6, 7, 8
+*NSET, NSET=NFIX
+1, 2, 3, 4
+*NSET, NSET=NLOAD
+5, 6, 7, 8
+*MATERIAL, NAME=STEEL
+*ELASTIC
+210000., 0.3
+*SOLID SECTION, ELSET=EALL, MATERIAL=STEEL
+*STEP
+*STATIC
+*BOUNDARY
+NFIX, 3, 3, 0.
+1, 1, 2, 0.
+2, 2, 2, 0.
+*CLOAD
+NLOAD, 3, -0.25
+*NODE FILE
+U
+*END STEP

@@ -20,7 +20,8 @@ What is computed here
 1. 3D solid model (build123d): two rotor discs with 10 sector magnets + PCB stator
 2. 2D magnetostatic FEM (own linear solver, magnetic scalar potential, SI units)
    on the unrolled domain at mean radius -> air-gap flux density map
-3. Analytical magnetic circuit -> B_g, Kt; winding resistance from trace geometry
+3. Analytical magnetic circuit (dual-rotor TORUS: 2 magnets in series, 2 gaps,
+   one PCB) -> B_g, Kt; winding resistance from trace geometry
 4. Comparison with the measured Kt and R, plus the implied magnet thickness
 
 Usage:
@@ -71,10 +72,20 @@ def pole_area() -> float:
 
 
 def circuit_Bg(h_m: float = H_M, br: float = BR) -> dict:
-    """1-D magnetic circuit through magnet -> gap -> PCB -> iron."""
-    g_eff = GAP + PCB_T          # non-magnetic path (PCB is non-magnetic)
-    # two magnets in series (N and S poles of the same flux loop) + gap + PCB
-    Bg = br / (1.0 + (g_eff) / h_m)
+    """1-D magnetic circuit of the **dual-rotor (TORUS)** topology.
+
+    The two rotor discs drive flux through the same PCB from both sides, so the
+    flux loop contains two magnets in series, two air gaps and one PCB:
+
+        MMF = 2 * Br * h_m / mu0
+        R   = 2*h_m/(mu0*mu_r) + 2*gap/mu0 + pcb_t/mu0
+        Bg  = MMF / (R * mu0) = 2*Br*h_m / (2*h_m/mu_r + 2*gap + pcb_t)
+
+    The old single-rotor expression Br/(1 + (gap+pcb)/h_m) describes a
+    different machine (one rotor + return iron) and underestimates Bg by ~42 %.
+    """
+    g_eff = 2.0 * GAP + PCB_T
+    Bg = 2.0 * br * h_m / (2.0 * h_m / MU_R_MAG + g_eff)
     return {"h_m": h_m, "g_eff_m": g_eff, "B_g_T": Bg,
             "flux_per_pole_Wb": Bg * pole_area()}
 
@@ -133,10 +144,21 @@ def solve_2d(nx: int = 160, ny: int = 120, h_m: float = H_M, br: float = BR) -> 
     # polarity: first half of the period is +y, second half -y
     My[mag] = np.where(cx[mag] < Lx / 2, br / MU0, -br / MU0)
 
-    # assemble
+    # assemble.  Periodic in x is imposed *before* assembly by merging the
+    # right column into the left one (slave DOF).  The previous "column
+    # substitution" zeroed the right boundary instead of tying it to the left
+    # one, which produced a non-periodic field (phi(0) - phi(Lx) != 0).
     n = pts.shape[0]
+    left = nid[:, 0]
+    right = nid[:, nx]
+    remap = np.arange(n)
+    remap[right] = left
+    red_order = np.unique(remap)
+    red_index = {int(g): k for k, g in enumerate(red_order)}
+    nred = len(red_order)
+
     rows, cols, vals = [], [], []
-    f = np.zeros(n)
+    f = np.zeros(nred)
     for e, (i0, i1, i2) in enumerate(tris):
         x1, y1 = pts[i0]; x2, y2 = pts[i1]; x3, y3 = pts[i2]
         det = (x2 - x1) * (y3 - y1) - (x3 - x1) * (y2 - y1)
@@ -146,7 +168,7 @@ def solve_2d(nx: int = 160, ny: int = 120, h_m: float = H_M, br: float = BR) -> 
         c = np.array([x3 - x2, x1 - x3, x2 - x1]) / det
         area = abs(det) / 2
         Ke = mu[e] * area * (np.outer(b, b) + np.outer(c, c))
-        idx = [i0, i1, i2]
+        idx = [red_index[int(remap[i0])], red_index[int(remap[i1])], red_index[int(remap[i2])]]
         for a in range(3):
             for bb in range(3):
                 rows.append(idx[a]); cols.append(idx[bb]); vals.append(Ke[a, bb])
@@ -157,31 +179,19 @@ def solve_2d(nx: int = 160, ny: int = 120, h_m: float = H_M, br: float = BR) -> 
 
     from scipy.sparse import coo_matrix
     from scipy.sparse.linalg import spsolve
-    K = coo_matrix((vals, (rows, cols)), shape=(n, n)).tocsr()
+    K = coo_matrix((vals, (rows, cols)), shape=(nred, nred)).tocsr()
 
-    # periodic in x: phi(right) = phi(left).  Substitute the column, otherwise
-    # the system is singular (this produced 1e74 garbage on the first run).
-    left = nid[:, 0]
-    right = nid[:, nx]
+    # Dirichlet phi = 0 on the (reduced) outer iron surface
+    top_red = sorted({red_index[int(remap[t])] for t in nid[ny, :]})
     K = K.tolil()
-    for j in range(ny + 1):
-        K[:, left[j]] = K[:, left[j]] + K[:, right[j]]
-        K[:, right[j]] = 0.0
-        K[right[j], :] = 0.0
-        K[right[j], right[j]] = 1.0
-        f[left[j]] += f[right[j]]
-        f[right[j]] = 0.0
-    K = K.tocsr()
-    # Dirichlet phi = 0 on the outer iron surface
-    top = nid[ny, :]
-    K = K.tolil()
-    for t in top:
+    for t in top_red:
         K[t, :] = 0.0
         K[t, t] = 1.0
     K = K.tocsr()
-    f[top] = 0.0
+    f[top_red] = 0.0
 
-    phi = spsolve(K, f)
+    phi_red = spsolve(K, f)
+    phi = np.array([phi_red[red_index[int(remap[i])]] for i in range(n)])
 
     # B = -mu grad(phi) + mu0 M
     Bx = np.zeros(len(tris)); By = np.zeros(len(tris))
@@ -250,10 +260,12 @@ def main() -> int:
     th = job / "afpm"
     th.mkdir(parents=True, exist_ok=True)
     res = solve_2d()
+    circ = circuit_Bg()
     info = {
         "Bg_fem_T": round(res["Bg_avg"], 4),
-        "Bg_circuit_T": round(circuit_Bg()["B_g_T"], 4),
-        "flux_per_pole_Wb": circuit_Bg()["flux_per_pole_Wb"],
+        "Bg_circuit_T": round(circ["B_g_T"], 4),
+        "flux_per_pole_fem_Wb": round(float(res["Bg_avg"]) * pole_area(), 10),
+        "flux_per_pole_circuit_Wb": round(float(circ["flux_per_pole_Wb"]), 10),
     }
     (th / "field.json").write_text(json.dumps(info, indent=2), encoding="utf-8")
     np.savez_compressed(th / "field.npz", pts=res["pts"], tris=res["tris"],

@@ -14,7 +14,7 @@ import blade_geometry as bg
 
 @pytest.fixture(scope="module")
 def design():
-    r, chord, twist = bg.design_distribution(26.5, 9.0, 3, 1.2, 7.0, 20, 1.5)
+    r, chord, twist = bg.design_distribution(26.5, 9.0, 3, 1.2, 7.0, 20, 2.5)
     chord = np.minimum(chord, 2.5)      # manufacturability cap used in the case
     return r, chord, twist
 
@@ -36,8 +36,8 @@ def test_chord_is_capped_and_monotonic_at_tip(design):
 def test_bem_design_point(design):
     r, chord, twist = design
     p = bb.bem_point(9.0, 9.0, r, chord, twist)
-    assert p["cp"] == pytest.approx(0.454, abs=2e-3)
-    assert p["thrust_kN"] == pytest.approx(93.95, abs=0.5)
+    assert p["cp"] == pytest.approx(0.4557, abs=2e-3)
+    assert p["thrust_kN"] == pytest.approx(94.25, abs=0.5)
 
 
 def test_cp_curve_shape(design):
@@ -55,5 +55,5 @@ def test_power_scales_with_v_cubed_at_fixed_rpm(design):
     omega = 25.0 * 2 * np.pi / 60.0
     p9 = bb.bem_point(omega * 26.5 / 9.0, 9.0, r, chord, twist)["power_kW"]
     p14 = bb.bem_point(omega * 26.5 / 14.0, 14.0, r, chord, twist)["power_kW"]
-    assert p9 == pytest.approx(455.3, abs=8.0)
-    assert p14 == pytest.approx(1077.2, abs=25.0)
+    assert p9 == pytest.approx(455.37, abs=8.0)
+    assert p14 == pytest.approx(1077.33, abs=25.0)

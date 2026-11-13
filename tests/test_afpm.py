@@ -20,7 +20,24 @@ def test_pole_area():
 
 
 def test_airgap_flux_density_matches_report():
-    assert am.circuit_Bg(0.001)["B_g_T"] == pytest.approx(0.1793, abs=1e-4)
+    """Dual-rotor (TORUS) 1-D circuit: 2 magnets in series + 2 gaps + 1 PCB."""
+    assert am.circuit_Bg(0.001)["B_g_T"] == pytest.approx(0.30935, abs=1e-4)
+
+
+def test_circuit_flux_uses_the_same_Bg():
+    """flux_per_pole must be derived from the circuit Bg (no mixed bases)."""
+    c = am.circuit_Bg(0.001)
+    assert c["flux_per_pole_Wb"] == pytest.approx(c["B_g_T"] * am.pole_area(), rel=1e-12)
+    assert c["flux_per_pole_Wb"] == pytest.approx(7.5804e-06, rel=1e-4)
+
+
+def test_kt_from_the_circuit_needs_more_turns_than_the_paper_states():
+    """Even the (optimistic) 2-D FEA Bg needs ~459 turns; the correct 1-D
+    circuit (0.309 T) needs ~563 turns, while Table I implies 216."""
+    Bg = am.circuit_Bg(0.001)["B_g_T"]
+    implied = am.KT_MEAS / (1.5 * am.P_PAIRS * Bg * am.pole_area())
+    assert implied == pytest.approx(562.9, abs=3.0)
+    assert am.kt_from_Bg(Bg, 216.0) * 1e3 == pytest.approx(12.28, abs=0.02)
 
 
 def test_flux_density_drops_with_thinner_magnet():

@@ -58,6 +58,26 @@ def naca4(m: float, p: float, t: float, n: int = 240):
     return upper, lower
 
 
+def naca4_ordinates(m: float, p: float, t: float, x: float):
+    """Exact NACA 4-digit upper/lower ordinates at one chordwise station x/c.
+
+    S2 must compare *the equations* with the reference table, so the ordinates
+    are evaluated analytically at the requested station.  Interpolating the
+    240-point cosine polyline instead leaks its discretisation error
+    (~2e-3 c near the leading edge) into the check.
+    """
+    yt = 5.0 * t * (0.2969 * math.sqrt(x) - 0.1260 * x - 0.3516 * x**2
+                    + 0.2843 * x**3 - 0.1015 * x**4)
+    if x < p:
+        yc = m / p**2 * (2.0 * p * x - x**2)
+        dy = 2.0 * m / p**2 * (p - x)
+    else:
+        yc = m / (1.0 - p) ** 2 * ((1.0 - 2.0 * p) + 2.0 * p * x - x**2)
+        dy = 2.0 * m / (1.0 - p) ** 2 * (p - x)
+    th = math.atan(dy)
+    return yc + yt * math.cos(th), yc - yt * math.cos(th)
+
+
 def thin_airfoil(m: float, p: float) -> dict:
     """alpha_L0 and Cl(alpha) from thin-airfoil theory applied to the camber line."""
     th = np.linspace(0.0, math.pi, 200001)[1:-1]
@@ -122,13 +142,13 @@ def main() -> int:
     }
     ord_errors = []
     for xc, (yu_ref, yl_ref) in table.items():
-        yu = float(np.interp(xc, upper[:, 0], upper[:, 1]))
-        yl = float(np.interp(xc, lower[:, 0], lower[:, 1]))
+        # analytic evaluation (not interpolation of the 240-point polyline)
+        yu, yl = naca4_ordinates(m, p, t, xc)
         ord_errors.append({
             "x_over_c": xc,
-            "upper_ref": yu_ref, "upper_calc": round(yu, 4),
-            "lower_ref": yl_ref, "lower_calc": round(yl, 4),
-            "max_abs_err": round(max(abs(yu - yu_ref), abs(yl - yl_ref)), 4),
+            "upper_ref": yu_ref, "upper_calc": round(yu, 6),
+            "lower_ref": yl_ref, "lower_calc": round(yl, 6),
+            "max_abs_err": round(max(abs(yu - yu_ref), abs(yl - yl_ref)), 6),
         })
 
     # ---- S3 thin-airfoil theory -------------------------------------------

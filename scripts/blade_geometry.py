@@ -8,13 +8,22 @@ Optimization of Horizontal-Axis Wind Turbines for Sustainable Energy
 Development", Renewable Energy Research and Applications 7(1):117-127, 2026,
 DOI 10.22044/rera.2026.17534.1520.
 
-Design rules taken from the paper (section 2.3):
+Paper's design rules (section 2.3, as printed):
     B = 3 blades, design TSR lambda = 9, design CL = 0.85, design alpha = 7 deg
     phi(r) = (2/3) atan(1/(lambda * r/R))
     c(r)   = (8*pi*r/B/CL) * sin(phi/3) * cos^2(phi/3) / (1 - cos(phi))
     theta(r) = phi(r) - alpha_design
     rotor radius R = 25 m, baseline max chord 2.5 m
     best airfoil: NACA 5512 (5% camber at 50% chord, 12% thick)
+
+IMPORTANT (implementation vs paper): the case artifacts were produced with
+    phi(r) = atan(1/(lambda*r/R))                     # a = 0 inflow angle
+    c(r)   = 8*pi*r*sin^2(phi) / (3*B*CL*cos(phi))
+which differs from the printed paper formula in three ways (the paper's
+(2/3) factor on phi, the sin(phi/3)cos^2(phi/3)/(1-cos(phi)) chord shape, and
+the 8*pi/3 vs 4*pi optimum factor).  The discrepancies and their numerical
+impact are analysed in docs/Wind-Blade-Validation-Report.md section 1.2; the
+implementation is left unchanged so the stored benchmark stays reproducible.
 Reported performance: Cp_max = 0.52 at TSR = 9; 500 kW at 9 m/s; 1373 kW at 14 m/s.
 
 Outputs
@@ -91,29 +100,33 @@ def _k1_lookup(camber_code: int, m_pos: float) -> float:
 # --------------------------------------------------------------------------- #
 def design_distribution(R: float, tsr: float, B: int, cl_design: float,
                         alpha_deg: float, nsec: int = 24, r_hub: float = 0.1 * 25.0):
-    """Chord [m] and twist [deg] along the span.
+    """Chord [m] and twist [deg] along the span (design law used by the case).
 
-    Standard Glauert/BET optimum for a = 1/3 (Manwell et al., Wind Energy
-    Explained, eq. 3.6.x):
+        phi(r)   = atan(1 / (lambda * r/R))            # a = 0 inflow angle
+        c(r)     = 8*pi*r*sin^2(phi) / (3*B*CL*cos(phi))
+        theta(r) = phi(r) - alpha_design
 
-        phi(r)  = atan(1 / (lambda * r/R))
-        c(r)    = 8*pi*r*sin^2(phi) / (3*B*CL*cos(phi))
-        theta(r)= phi(r) - alpha_design
-
-    NOTE on the paper: its printed chord relation
-        c = (8*pi*r/(B*CL)) * sin(phi/3)*cos^2(phi/3)/(1-cos(phi))
-    evaluates to ~29 m at r = 2.5 m for R = 25 m, which contradicts the paper's
-    own "baseline chord 2.5 m". The a = 1/3 form below gives ~2.7 m at the same
-    station and reproduces the stated 2.5 m baseline, so it is used here and the
-    discrepancy is reported as a data-quality finding.
+    Deviations from the printed paper formula (documented, not silently fixed):
+      * the paper prints phi = (2/3)*atan(1/(lambda*r/R)).  Substituting that
+        phi into the a = 1/3 chord form gives 2.72 m at r = 2.5 m (R = 25,
+        CL = 0.85), i.e. the report's "2.72 m" is reproducible *under the
+        paper's phi*; this code's phi gives 5.22 m at r = 2.5 m (R = 26.5,
+        CL = 1.2), which is then clipped to 2.5 m;
+      * the paper's own chord formula gives ~29 m at r = 2.5 m, contradicting
+        its 2.5 m baseline chord;
+      * the exact a = 1/3 optimum factor is 4*pi*r, not 8*pi/3 (the implemented
+        form corresponds to a = 1/4).
+    The case artifacts were generated with the implementation above; see
+    docs/Wind-Blade-Validation-Report.md section 1.2 for the analysis.
     """
     r = np.linspace(r_hub, R, nsec)
     lam_r = tsr * r / R
     phi = np.arctan(1.0 / lam_r)
     chord_opt = 8.0 * math.pi * r * np.sin(phi) ** 2 / (3.0 * B * cl_design * np.cos(phi))
-    # manufacturability cap at the paper's baseline maximum chord (2.5 m):
-    # the a=1/3 optimum gives ~6.8 m near r/R = 0.2, which is not buildable and
-    # contributes little to power (low local speed), so it is clipped.
+    # Manufacturability cap at the paper's baseline maximum chord (2.5 m).
+    # The uncapped law gives 5.22 m at r = 2.5 m (R = 26.5, CL = 1.2) and
+    # 7.37 m with CL = 0.85; the clipped region is the low-power inner span.
+    # Removing the cap changes Cp by < 0.5 % (see the wind-blade report).
     chord = np.minimum(chord_opt, 2.5)
     twist = np.degrees(phi) - alpha_deg
     return r, chord, twist
@@ -164,7 +177,9 @@ def main() -> int:
     ap.add_argument("--cl", type=float, default=0.85)
     ap.add_argument("--alpha", type=float, default=7.0)
     ap.add_argument("--nsec", type=int, default=24)
-    ap.add_argument("--rhub", type=float, default=1.5)
+    ap.add_argument("--rhub", type=float, default=2.5,
+                    help="hub (root cut-out) radius in m; 2.5 m is what the "
+                         "stored case used (24 m span, R = 26.5 m)")
     args = ap.parse_args()
 
     job = Path(args.job).resolve()
@@ -172,7 +187,7 @@ def main() -> int:
     out.mkdir(parents=True, exist_ok=True)
 
     r, chord, twist = design_distribution(args.R, args.tsr, args.B, args.cl,
-                                          args.alpha, args.nsec)
+                                          args.alpha, args.nsec, args.rhub)
     # chords are already capped at 2.5 m by the design law
     scale = 1.0
 

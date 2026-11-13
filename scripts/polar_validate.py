@@ -35,7 +35,8 @@ import numpy as np
 
 # ---- ground truth transcribed from the paper -------------------------------- #
 PAPER = {
-    "title": "Performance analysis of NACA 2412 and NACA 4412 airfoils (CFD)",
+    "title": "Characterization of NACA 2412 and NACA 4412 airfoils: Effects of angle of attack on aerodynamics coefficients",
+    "authors": "D. Akgumus Gok, K. N. M. Al-Nimer",
     "journal": "Journal of Thermal Engineering 10(6): 1524-1538, 2024",
     "doi": "10.14744/thermal.0000892",
     "license": "CC BY-NC",

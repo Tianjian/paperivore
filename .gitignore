@@ -22,6 +22,9 @@ venv/
 !results/**/*.csv
 !results/**/*.step
 
+# keep the solver smoke-test deck
+!scripts/smoke.inp
+
 # os
 Thumbs.db
 .DS_Store

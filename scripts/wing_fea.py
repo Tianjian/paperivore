@@ -97,12 +97,16 @@ def build_deck(job: Path, d, s, E, nu, rho_mat, load_mode: str = "body"):
 
     Units: mm, N, MPa, t, s.  Two equivalent ways to apply the same lift q [N/m]:
       * load_mode="body"     : *DLOAD GRAV with an effective density chosen so that
-                               rho_eff * g * A = q.  Gives a clean global bending
-                               field (no local plate bending at the load points),
-                               which is what the beam-theory comparison needs.
-      * load_mode="pressure" : *DLOAD P on the top skin faces.  More physical, but
-                               adds local wall bending that contaminates the stress
-                               comparison at the section level.
+                               rho_eff * g * A = q.  Convenient, but it applies the
+                               transverse "inertia" to *all* walls, which adds a
+                               model artefact of about +3 pp to the tip deflection
+                               (measured: 1.8353 mm body vs 1.7794 mm pressure on the
+                               same mesh).  Kept as the default only so the stored
+                               artefacts stay reproducible.
+      * load_mode="pressure" : *DLOAD P on the top skin faces.  Closer to the real
+                               skin loading and therefore the recommended setting
+                               for new runs/comparisons (small local wall bending at
+                               the load application is a physical effect, not a bug).
     """
     msh = job / "wing" / "mesh.msh"
     if not msh.exists():
@@ -244,9 +248,20 @@ def post(job: Path, E):
         raise SystemExit(f"ERROR: missing {frd}; run ccx_i8 -i job in {wing}")
 
     res = frd_reader.read_frd_results(frd)
-    nodes, _ = frd_reader.read_inp_mesh(wing / "job.inp")
+    nodes, elements = frd_reader.read_inp_mesh(wing / "job.inp")
     disp = res.get("DISP", {})
-    stress = res.get("STRESS", {})
+    stress = res.get("STRESS", {})   # nodal (CalculiX FRD), keyed by NODE id
+
+    # Element-averaged stress: average the nodal values over each element's
+    # connectivity.  The FRD carries one value per node, so using `stress[eid]`
+    # directly mixes the node and element numbering spaces (the old bug that
+    # made the section table meaningless).
+    elem_stress: dict[int, list[float]] = {}
+    for eid, (etype, conn) in enumerate(elements, start=1):
+        vals = [stress[n] for n in conn if n in stress]
+        if len(vals) != len(conn) or not vals:
+            continue
+        elem_stress[eid] = [sum(v[i] for v in vals) / len(vals) for i in range(6)]
 
     # tip deflection: max |U| among nodes at max z (FRD displacements are in mm,
     # because the deck is in mm)
@@ -258,28 +273,30 @@ def post(job: Path, E):
 
     # Bending stress: compare S11 (axial, along the span->x? see note) at the root.
     # In this model the span runs along Z, so the bending axial stress is S33.
-    s11 = []
-    s33 = []
-    for eid, s in stress.items():
-        if len(s) >= 6:
-            s11.append(abs(s[0]))
-            s33.append(abs(s[2]))
+    s11 = [abs(s[0]) for s in stress.values() if len(s) >= 6]
+    s33 = [abs(s[2]) for s in stress.values() if len(s) >= 6]
     sigma_fea = max(s11) if s11 else float("nan")
-    sigma_axial = max(s33) if s33 else float("nan")
+    sigma_axial = max(s33) if s33 else float("nan")          # nodal extrapolated peak
 
-    vm = []
-    for eid, s in stress.items():
-        if len(s) >= 6:
-            vm.append(0.5 * ((s[0] - s[1]) ** 2 + (s[1] - s[2]) ** 2 + (s[2] - s[0]) ** 2)
-                      + 3 * (s[3] ** 2 + s[4] ** 2 + s[5] ** 2))
-    sigma_vm = math.sqrt(max(vm)) if vm else float("nan")
+    def _vm(s):
+        return math.sqrt(0.5 * ((s[0] - s[1]) ** 2 + (s[1] - s[2]) ** 2 + (s[2] - s[0]) ** 2)
+                         + 3 * (s[3] ** 2 + s[4] ** 2 + s[5] ** 2))
+
+    sigma_vm = max((_vm(s) for s in stress.values() if len(s) >= 6), default=float("nan"))
+
+    # element-averaged peaks (physically meaningful, comparable to beam theory)
+    s11_e = [abs(s[0]) for s in elem_stress.values()]
+    s33_e = [abs(s[2]) for s in elem_stress.values()]
+    vm_e = [_vm(s) for s in elem_stress.values()]
+    sigma_axial_ea = max(s33_e) if s33_e else float("nan")
+    sigma_vm_ea = max(vm_e) if vm_e else float("nan")
 
     design = json.loads((wing / "design.json").read_text(encoding="utf-8"))
     theory = design["beam_theory"]
 
     # Section-by-section check away from the clamped root (where the peak is a
     # boundary/corner artefact): sigma(z) = M(z)*c/I, M(z) = q*(b-z)^2/2
-    nodes_all, elements = frd_reader.read_inp_mesh(wing / "job.inp")
+    nodes_all = nodes
     q_n_mm = design["design"]["lift_per_span_N_m"] / 1e3      # N/mm
     b_mm = design["design"]["span_m"] * 1e3
     I = design["section"]["I_m4"] * 1e12                       # mm^4
@@ -289,8 +306,8 @@ def post(job: Path, E):
         vals = []
         for eid, (etype, conn) in enumerate(elements, start=1):
             zc = sum(nodes_all[n][2] for n in conn if n in nodes_all) / max(len(conn), 1)
-            if abs(zc - z_target) < 3.0 and eid in stress and len(stress[eid]) >= 6:
-                vals.append(abs(stress[eid][2]))               # S33 = axial
+            if abs(zc - z_target) < 3.0 and eid in elem_stress:
+                vals.append(abs(elem_stress[eid][2]))          # S33 = axial (element-averaged)
         if not vals:
             continue
         M = q_n_mm * (b_mm - z_target) ** 2 / 2.0
@@ -332,6 +349,8 @@ def post(job: Path, E):
             "max_s11_MPa": round(sigma_fea, 4),
             "max_s33_MPa": round(sigma_axial, 4),
             "max_vm_stress_MPa": round(sigma_vm, 4),
+            "max_s33_element_avg_MPa": round(sigma_axial_ea, 4),
+            "max_vm_stress_element_avg_MPa": round(sigma_vm_ea, 4),
             "tip_nodes": len(tip),
             "n_disp": len(disp), "n_stress": len(stress),
         },
@@ -341,9 +360,14 @@ def post(job: Path, E):
         "error": {
             "deflection_rel_err": round(abs(delta_fea - theory["tip_deflection_mm"]) / theory["tip_deflection_mm"], 4)
             if tip_u else None,
-            "root_peak_s33_rel_err": round(abs(sigma_axial - theory["root_bending_stress_MPa"]) / theory["root_bending_stress_MPa"], 4),
+            # the section table is the stress check; the global nodal/element
+            # peak sits in the clamped-root corner and is not a beam quantity
+            "section_s33_max_rel_err": (round(max(s["rel_err"] for s in sections), 4)
+                                        if sections else None),
         },
-        "note": "deflection profile is the primary check; the S33 peak is mesh/boundary sensitive in the 3 mm walls",
+        "note": ("deflection profile is the primary check; the nodal S33 peak is a small-area "
+                 "extrapolation artefact, while the section table uses element-averaged nodal stresses "
+                 "(node/element id spaces are no longer mixed)"),
     }
     (wing / "result.json").write_text(json.dumps(info, indent=2, ensure_ascii=False), encoding="utf-8")
     print(json.dumps(info, indent=2, ensure_ascii=False))

@@ -12,6 +12,7 @@ import numpy as np
 import pytest
 
 import polar_validate as pv
+import airfoil_validate as av
 
 
 def naca_stats(m: float, p: float, t: float):
@@ -60,6 +61,20 @@ def test_lift_slope_is_two_pi_per_radian():
 def test_cl_at_five_degrees():
     a0 = math.radians(pv.thin_airfoil(0.04, 0.40)["alpha_L0_deg"])
     assert pv.cl_thin(5.0, a0) == pytest.approx(1.0039, abs=1e-4)
+
+
+def test_s2_ordinates_are_evaluated_not_interpolated():
+    """S2 used to interpolate the reversed TE->LE polyline and returned 0.0
+    for every upper station.  The check must evaluate the NACA equations."""
+    table = {
+        0.10: (0.0638, -0.0288), 0.30: (0.0974, -0.0224),
+        0.50: (0.0918, -0.0140), 0.70: (0.0666, -0.0066),
+        0.90: (0.0266, -0.0022), 1.00: (0.0012, -0.0012),
+    }
+    for xc, (yu_ref, yl_ref) in table.items():
+        yu, yl = av.naca4_ordinates(0.04, 0.40, 0.12, xc)
+        assert yu == pytest.approx(yu_ref, abs=1e-4)
+        assert yl == pytest.approx(yl_ref, abs=1e-4)
 
 
 def test_symmetric_section_has_zero_lift_at_zero_incidence():

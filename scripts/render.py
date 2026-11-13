@@ -73,16 +73,13 @@ def frd_to_vtk(job_dir: Path) -> Path:
 
 
 def summarize(vtk_path: Path) -> dict:
+    """与 frd_reader 共用同一口径（节点外插峰值 + 单元平均峰值）。"""
     import pyvista as pv
 
-    mesh = pv.read(str(vtk_path))
-    result: dict = {"vtk": str(vtk_path), "n_points": int(mesh.n_points), "arrays": list(mesh.array_names)}
-    if "U_mag" in mesh.point_data:
-        result["max_disp_mm"] = float(mesh.point_data["U_mag"].max())
-    if "S_vm" in mesh.cell_data:
-        result["max_vm_stress_MPa"] = float(mesh.cell_data["S_vm"].max())
-        result["max_vm_stress_note"] = "element peak from raw FRD (un-averaged)"
-    return result
+    import frd_reader
+
+    grid = pv.read(str(vtk_path))
+    return frd_reader.summarize(vtk_path.parent, grid)
 
 
 def _surface(path: Path):

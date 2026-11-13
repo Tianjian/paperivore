@@ -81,7 +81,16 @@ def build_deck(job: Path, h: float) -> int:
     zmin = min(c[2] for c in coords.values())
     zmax = max(c[2] for c in coords.values())
     root = [n for n, c in coords.items() if abs(c[2] - zmin) < 1e-6]
-    n_elem = sum(1 for s in raw if s.strip().upper().startswith("*ELEMENT"))
+    n_elem, in_elem = 0, False
+    for raw_line in raw:
+        text_line = raw_line.strip()
+        if not text_line:
+            continue
+        if text_line.startswith("*"):
+            in_elem = text_line.upper().startswith("*ELEMENT")
+            continue
+        if in_elem:
+            n_elem += 1
 
     # 3) aero load: per-node weights normalised to the BEM thrust per blade
     bem = json.loads((job / "bem" / "bem.json").read_text(encoding="utf-8"))
